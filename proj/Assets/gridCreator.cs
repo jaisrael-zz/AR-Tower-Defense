@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
+
+
 public class gridCreator : MonoBehaviour {
 
 	public GameObject gridTile;
+	public GameObject edgeLight;
 
 	int gridWidth = 10;
 	int gridHeight = 10;
@@ -26,6 +29,15 @@ public class gridCreator : MonoBehaviour {
 			}
 		}
 
+
+		for(float i = 0.0f; i <= gridWidth*1.1f; i+=2.2f)
+		{
+			for(float j = 0.0f; j <= gridHeight*1.1f; j+=2.2f)
+			{
+				GameObject light = (GameObject)Instantiate(edgeLight);
+				light.transform.position = new Vector3(i-0.5f,0,j-2f);
+			}
+		}
 
 	}
 	
