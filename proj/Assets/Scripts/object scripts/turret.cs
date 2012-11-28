@@ -58,9 +58,10 @@ public class turret : MonoBehaviour {
 			}
 			if(minDist != 0)
 			{
-				Debug.Log(target);
+				//Debug.Log(target);
 				createMissile(target);
 			}
+			timeSinceLastFire = 0;
 		}
 	}
 }

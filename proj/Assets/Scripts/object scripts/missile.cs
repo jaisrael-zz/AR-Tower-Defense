@@ -16,10 +16,20 @@ public class missile : MonoBehaviour {
 	
 	}
 	
+	void onHit () {
+		//send message to turret
+		Destroy(this);
+	}
+
 	// Update is called once per frame
 	void Update () {
 		float dt = Time.deltaTime;
 
-		
+		Vector3 distance = target.transform.position - this.transform.position;
+		Vector3 direction = distance/distance.magnitude;
+		Vector3 newPos = (direction * dt * speed);
+
+		if(newPos.magnitude > distance.magnitude) 	onHit();
+		else 	this.transform.position = this.transform.position + newPos;
 	}
 }
