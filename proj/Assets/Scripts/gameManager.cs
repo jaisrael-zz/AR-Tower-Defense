@@ -40,10 +40,6 @@ public class gameManager : MonoBehaviour {
 	public gridCreator gc;
 	private GameObject[,] grid;
 
-	//used for update
-	private int frame;
-	private int fps;
-
 	//used for object creation
 	private int complexity;
 
@@ -100,9 +96,6 @@ public class gameManager : MonoBehaviour {
 
 		grid = gc.createGameGrid();
 
-		frame = 0;
-		fps = 60;
-
 		complexity = 10;	
 
 		createTurret(new Vector2(5,5),turretType.basic);
@@ -112,7 +105,11 @@ public class gameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
-		frame++;
+		foreach(GameObject currentTurret in turrets)
+		{
+			turret t = (turret)currentTurret.GetComponent("turret");
+			t.Fire(creeps,new Vector2(10,10));
+		}
 
 	}
 }
