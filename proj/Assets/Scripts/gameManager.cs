@@ -15,6 +15,8 @@ public class gameManager : MonoBehaviour {
 
 		frame = 0;
 		fps = 60;
+
+		
 	}
 	
 	// Update is called once per frame

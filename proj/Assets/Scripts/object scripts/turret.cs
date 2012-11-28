@@ -7,6 +7,7 @@ public class turret : MonoBehaviour {
 	public int identifier; 			//turret type
 	public GameObject missile;		//missile
 	public int rate;				//fireRate
+	public int range;
 
 	//instantiated upon creation (gameManager.cs)
 	public gameManager gm;			//gets other object and game data
