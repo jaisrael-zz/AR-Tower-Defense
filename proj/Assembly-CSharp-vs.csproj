@@ -49,7 +49,6 @@
      <Compile Include="Assets\Scripts\object scripts\creep.cs" />
      <Compile Include="Assets\Scripts\object scripts\missile.cs" />
      <Compile Include="Assets\Scripts\object scripts\turret.cs" />
-     <Compile Include="Assets\Scripts\prefix.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

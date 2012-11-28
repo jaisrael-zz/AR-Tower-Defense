@@ -8,8 +8,8 @@ public class missile : MonoBehaviour {
 	public int damage;
 
 	//instantiated upon creation
-	public GameObject target;
-	public gameManager gm;
+	public Transform target;
+	//public gameManager gm;
 
 	// Use this for initialization
 	void Start () {

@@ -10,7 +10,7 @@ public class turret : MonoBehaviour {
 	public int range;
 
 	//instantiated upon creation (gameManager.cs)
-	public gameManager gm;			//gets other object and game data
+	//public gameManager gm;			//gets other object and game data
 
 	// Use this for initialization
 	void Start () {

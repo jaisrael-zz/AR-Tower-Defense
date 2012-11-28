@@ -10,7 +10,7 @@ public class creep : MonoBehaviour {
 
 	//instantiated upon creation
 	public GameObject target;
-	public gameManager gm;
+	//public gameManager gm;
 
 
 	// Use this for initialization
