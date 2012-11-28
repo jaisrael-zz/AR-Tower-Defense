@@ -18,7 +18,7 @@ public class missile : MonoBehaviour {
 	
 	void onHit () {
 		//send message to turret
-		Destroy(this);
+		Destroy(this.gameObject);
 	}
 
 	// Update is called once per frame
