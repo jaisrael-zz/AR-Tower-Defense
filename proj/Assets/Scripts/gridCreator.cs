@@ -8,14 +8,14 @@ public class gridCreator : MonoBehaviour {
 	public GameObject gridTile;
 	public GameObject edgeLight;
 
-	int gridWidth = 10;
-	int gridHeight = 10;
+	public int gridWidth;
+	public int gridHeight;
 
 	GameObject[,] grid;
 
 	// Use this for initialization
-	void Start () {
-
+	public GameObject[,] createGameGrid()
+	{
 		grid = new GameObject[gridWidth,gridHeight];
 
 		for(int i = 0; i < gridWidth; i++)
@@ -38,6 +38,11 @@ public class gridCreator : MonoBehaviour {
 				light.transform.position = new Vector3(i-0.5f,0,j-2f);
 			}
 		}
+
+		return grid;
+	}
+
+	void Start () {
 
 	}
 	

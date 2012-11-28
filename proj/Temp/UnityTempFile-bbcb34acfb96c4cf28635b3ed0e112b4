@@ -28,5 +28,8 @@
 -define:ENABLE_PROFILER
 -define:UNITY_EDITOR
 -define:UNITY_TEAM_LICENSE
+'Assets/Scripts/gameManager.cs'
+'Assets/Scripts/gridCreator.cs'
+'Assets/Scripts/prefix.cs'
+'Assets/gameManager.cs'
 'Assets/gridCreator.cs'
-'Assets/prefix.cs'
