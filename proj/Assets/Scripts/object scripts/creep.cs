@@ -12,14 +12,9 @@ public class creep : MonoBehaviour {
 	public GameObject target;
 	//public gameManager gm;
 
-	//current grid position
-	private int gridx;
-	private int gridy;
-
 	// Use this for initialization
 	void Start () {
-		gridx = (int)convertToGridPos(this.transform).x;
-		gridy = (int)convertToGridPos(this.transform).y;
+
 	}
 
 	// Update is called once per frame
@@ -28,7 +23,8 @@ public class creep : MonoBehaviour {
 	}
 
 	//called on hit
-	public void hit (float damage) {
+	public void hit (float damage) 
+	{
 		health -= damage;
 		//Debug.Log(health);
 		if (health < 0)
@@ -40,9 +36,12 @@ public class creep : MonoBehaviour {
 		}
 	}
 
-	void updateGridPos(Vector2 pos)
+	public void kamikaze()
 	{
-
+		GameObject g = GameObject.FindWithTag("Goal");
+		goal gscript = (goal)g.GetComponent("goal");
+		gscript.Hit(weight);
+		Destroy(this.gameObject);
 	}
 
 	Vector2 convertToGridPos(Transform t)
@@ -58,11 +57,9 @@ public class creep : MonoBehaviour {
 
 		Vector2 pos = convertToGridPos(this.transform);
 
-		Debug.Log(pos + " " + goal);
-
 		if(pos.x == goal.x && pos.y == goal.y)
 		{
-			Destroy(this.gameObject);
+			kamikaze();
 		}
 
 		//fail AI: move preference: right, up, left, down

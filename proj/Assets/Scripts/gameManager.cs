@@ -33,7 +33,7 @@ public class gameManager : MonoBehaviour {
 	public GameObject basicCreep;
 
 	//goal
-	//public GameObject goal;
+	public GameObject goal;
 
 	//spawn point
 	//public GameObject spawn;
@@ -50,6 +50,8 @@ public class gameManager : MonoBehaviour {
 
 	//public ArrayList turrets;
 	//public ArrayList creeps;
+
+	public Vector2 goalPos;
 
 	/////////////////////////////////////////////////////
 
@@ -79,6 +81,7 @@ public class gameManager : MonoBehaviour {
 	}
 
 	//initializers for objects
+	//createss turret, and sets grid tile traversibility to false
 	void createTurret(Vector2 gridPos, turretType type)
 	{
 		GameObject newTurretType = typeToTurret(type);
@@ -89,6 +92,7 @@ public class gameManager : MonoBehaviour {
 		//turrets.Add(newTurret);
 	}
 
+	//creates creep
 	void createCreep(Vector2 gridPos, creepType type)
 	{
 		GameObject newCreepType = typeToCreep(type);
@@ -96,6 +100,13 @@ public class gameManager : MonoBehaviour {
 		//newCreep.GetComponent("Turret").gm = this.GetComponent("Game Manager");
 		newCreep.tag = "Creep";
 		//creeps.Add(newCreep);
+	}
+
+	//creates goal, may not meed to exist
+	void createGoal(Vector2 gridPos)
+	{
+		GameObject newGoal = (GameObject)Instantiate(goal,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
+		newGoal.tag = "Goal";
 	}
 
 	void Start () {
@@ -112,12 +123,21 @@ public class gameManager : MonoBehaviour {
 			for(int j = 0; j < gc.gridHeight; j++)
 				traversible[i,j] = true;
 
+		goalPos = new Vector2(gc.gridWidth-1,gc.gridHeight-1);
+
 		complexity = 10;	
 
+		//test environment
 		createTurret(new Vector2(5,5),turretType.basic);
 		createTurret(new Vector2(7,5),turretType.basic);
+		createTurret(new Vector2(8,8),turretType.basic);
+
 		createCreep(new Vector2(3,3),creepType.basic);
 		createCreep(new Vector2(6,4),creepType.basic);
+		createCreep(new Vector2(1,5),creepType.basic);
+		createCreep(new Vector2(2,5),creepType.basic);
+
+		createGoal(goalPos);
 	}
 	
 	// Update is called once per frame
@@ -139,7 +159,7 @@ public class gameManager : MonoBehaviour {
 				c.Seek(new Vector2(9,9),traversible,10);
 			}
 		}
-		else if((int)state == (int)gameState.battlePhase)
+		else if((int)state == (int)gameState.buildPhase)
 		{
 			Debug.Log("Let's Build Yo");
 		}
