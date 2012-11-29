@@ -30,7 +30,8 @@ public class turret : MonoBehaviour {
 	{
 		GameObject newMissile = (GameObject)Instantiate(missileType,this.transform.position,this.transform.rotation);
 		missile m = (missile)newMissile.GetComponent("missile");
-		m.target = targetCreep;
+		m.tag = "Missile";
+		m.target = targetCreep.transform;
 	}
 
 	// Fire is called through the gameManager's update, to easily supply the creep list and goal position
@@ -59,6 +60,8 @@ public class turret : MonoBehaviour {
 			if(minDist != 0)
 			{
 				//Debug.Log(target);
+				this.transform.LookAt(target.transform.position);
+				this.transform.Rotate(0,180,0);
 				createMissile(target);
 			}
 			timeSinceLastFire = 0;

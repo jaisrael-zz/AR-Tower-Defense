@@ -4,11 +4,13 @@ using System.Collections;
 public class missile : MonoBehaviour {
 
 	//instantiated in prefab
-	public float speed;
-	public float damage;
+	public float speed;  //particle speed
+	public float damage; //damage at center
+	public float radius; //damage radius
+	public float att;	 //damage attenuation across area of effect
 
 	//instantiated upon creation
-	public GameObject target;
+	public Transform target;
 	//public gameManager gm;
 
 	// Use this for initialization
@@ -17,7 +19,14 @@ public class missile : MonoBehaviour {
 	}
 	
 	void onHit () {
-		//send message to turret
+		GameObject[] creeps = GameObject.FindGameObjectsWithTag("Creep");
+		foreach(GameObject creep in creeps)
+		{
+			float dFromCenter = Vector3.Distance(creep.transform.position,this.transform.position);
+			Debug.Log(dFromCenter);
+		}
+			
+
 		Destroy(this.gameObject);
 	}
 
@@ -25,7 +34,7 @@ public class missile : MonoBehaviour {
 	void Update () {
 		float dt = Time.deltaTime;
 
-		Vector3 distance = target.transform.position - this.transform.position;
+		Vector3 distance = target.position - this.transform.position;
 		Vector3 direction = distance/distance.magnitude;
 		Vector3 newPos = (direction * dt * speed);
 

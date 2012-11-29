@@ -15,16 +15,16 @@ public class creep : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+		
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-	
+		
 	}
 
 	//called on hit
 	void hit () {
-
+		
 	}
 }

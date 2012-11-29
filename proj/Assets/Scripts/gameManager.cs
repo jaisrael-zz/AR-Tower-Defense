@@ -78,6 +78,7 @@ public class gameManager : MonoBehaviour {
 	{
 		GameObject newTurretType = typeToTurret(type);
 		GameObject newTurret = (GameObject)Instantiate(newTurretType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
+		newTurret.tag = "Turret";
 		//newTurret.GetComponent("Creep").gm = this.GetComponent("Game Manager");
 		turrets.Add(newTurret);
 	}
@@ -87,6 +88,7 @@ public class gameManager : MonoBehaviour {
 		GameObject newCreepType = typeToCreep(type);
 		GameObject newCreep = (GameObject)Instantiate(newCreepType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
 		//newCreep.GetComponent("Turret").gm = this.GetComponent("Game Manager");
+		newCreep.tag = "Creep";
 		creeps.Add(newCreep);
 	}
 
