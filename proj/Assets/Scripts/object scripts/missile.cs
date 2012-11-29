@@ -41,6 +41,11 @@ public class missile : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+
+	}
+
+	//only done this way to make sure that missiles only fly during battle phase
+	public void Fly() {
 		float dt = Time.deltaTime;
 		if(target == null) Destroy(this.gameObject);
 		else {

@@ -6,6 +6,7 @@ public enum gameState {
 	loadScreen,
 	buildPhase,
 	battlePhase,
+	paused,
 	gameOver
 };
 //possible turrets
@@ -199,7 +200,14 @@ public class gameManager : MonoBehaviour {
 				creep c = (creep)currentCreep.GetComponent("creep");
 				c.Seek(new Vector2(9,9),traversible,10);
 			}
-			//Debug.Log(creeps.Length);
+
+			//update missiles 
+			foreach(GameObject currentMissile in GameObject.FindGameObjectsWithTag("Missile"))
+			{
+				missile m = (missile)currentMissile.GetComponent("missile");
+				m.Fly();
+			}
+
 			//check if wave is defeated
 			if(creeps == null || creeps.Length == 0)
 			{
@@ -212,11 +220,11 @@ public class gameManager : MonoBehaviour {
 		}
 		else if((int)state == (int)gameState.buildPhase)
 		{
-			Debug.Log("Let's Build Yo");
+			//Debug.Log("Let's Build Yo");
 		}
 		else if((int)state == (int)gameState.gameOver)
 		{
-			Debug.Log("YOU LOSE");
+			//Debug.Log("YOU LOSE");
 		}
 	}
 
