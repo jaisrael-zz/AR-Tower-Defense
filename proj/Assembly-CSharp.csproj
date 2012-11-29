@@ -45,7 +45,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\gameManager.cs" />
-     <Compile Include="Assets\Scripts\gridCreator.cs" />
+     <Compile Include="Assets\Scripts\manager subscripts\gridCreator.cs" />
+     <Compile Include="Assets\Scripts\manager subscripts\spawnManager.cs" />
      <Compile Include="Assets\Scripts\object scripts\creep.cs" />
      <Compile Include="Assets\Scripts\object scripts\goal.cs" />
      <Compile Include="Assets\Scripts\object scripts\missile.cs" />

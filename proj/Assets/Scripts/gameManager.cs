@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-//default enum initialization 0,1,2,...
-//possible game states
 public enum gameState {
 	titleScreen,
 	loadScreen,
@@ -19,12 +17,13 @@ public enum creepType {
 	basic
 }
 
+
 public class gameManager : MonoBehaviour {
 
 	public gameState state;
 
 	/////////////////////////////////////////////////////
-	//object types created here:
+	//Object Management
 	
 	//turrets
 	public GameObject basicTurret;
@@ -39,24 +38,23 @@ public class gameManager : MonoBehaviour {
 	public GameObject spawn;
 
 	/////////////////////////////////////////////////////
-
+	//Grid Management
 	//makes game grid
 	public gridCreator gc;
 	private GameObject[,] grid;
 	private bool[,] traversible;
 
-	//used for object creation
-	private int wave;
-	private int complexity;
-
 	//public ArrayList turrets;
 	//public ArrayList creeps;
 
 	public Vector2 goalPos;
-	public Vector2 spawnPos;
 
 	/////////////////////////////////////////////////////
+	//Spawn Management
+	public spawnManager sm;
 
+
+	/////////////////////////////////////////////////////
 	//Initialization
 
 	// enum to GameObject converters
@@ -95,7 +93,7 @@ public class gameManager : MonoBehaviour {
 	}
 
 	//creates creep
-	void createCreep(Vector2 gridPos, creepType type)
+	public void createCreep(Vector2 gridPos, creepType type)
 	{
 		GameObject newCreepType = typeToCreep(type);
 		GameObject newCreep = (GameObject)Instantiate(newCreepType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
@@ -134,37 +132,56 @@ public class gameManager : MonoBehaviour {
 				traversible[i,j] = true;
 
 		goalPos = new Vector2(gc.gridWidth-1,gc.gridHeight-1);
-		spawnPos = new Vector2(0,0);
 
 		createGoal(goalPos);
-		createSpawn(spawnPos);
-
-		wave = 1;
-		complexity = 10;	
+		createSpawn(sm.spawnPos);
+	
 
 		//test environment
 		createTurret(new Vector2(5,5),turretType.basic);
 		createTurret(new Vector2(7,5),turretType.basic);
 		createTurret(new Vector2(8,8),turretType.basic);
+		createTurret(new Vector2(1,1),turretType.basic);
+		createTurret(new Vector2(4,0),turretType.basic);
+		createTurret(new Vector2(4,1),turretType.basic);
+		createTurret(new Vector2(4,2),turretType.basic);
 
-		createCreep(new Vector2(3,3),creepType.basic);
+		/*createCreep(new Vector2(3,3),creepType.basic);
 		createCreep(new Vector2(6,4),creepType.basic);
 		createCreep(new Vector2(1,5),creepType.basic);
 		createCreep(new Vector2(2,5),creepType.basic);
-
+*/
 
 	}
 	
+	/////////////////////////////////////////////////////
+
 	// game State Managers
+	// currently, it would make sense to instead just change
+	// the state variable where these function calls happen,
+	// other things could happen though
 	public void lose () {
 		state = gameState.gameOver;
 	}
+
+	public void win () {
+		state = gameState.buildPhase;
+	}
+
+	public void beginWave () {
+		state = gameState.battlePhase;
+	}
+	/////////////////////////////////////////////////////
 
 	// Update is called once per frame
 	void Update () {
 
 		if((int)state == (int)gameState.battlePhase)
 		{
+
+			//continue spawning current wave
+			sm.UpdateSpawn();
+
 			//execute turret AI
 			foreach(GameObject currentTurret in GameObject.FindGameObjectsWithTag("Turret"))
 			{
@@ -173,10 +190,21 @@ public class gameManager : MonoBehaviour {
 			}
 
 			//execute creep AI
-			foreach(GameObject currentCreep in GameObject.FindGameObjectsWithTag("Creep"))
+			GameObject[] creeps = GameObject.FindGameObjectsWithTag("Creep");
+			foreach(GameObject currentCreep in creeps)
 			{
 				creep c = (creep)currentCreep.GetComponent("creep");
 				c.Seek(new Vector2(9,9),traversible,10);
+			}
+			//Debug.Log(creeps.Length);
+			//check if wave is defeated
+			if(creeps == null || creeps.Length == 0)
+			{
+				Debug.Log("here");
+				if(sm.isWaveDefeated())
+				{
+					win();
+				}
 			}
 		}
 		else if((int)state == (int)gameState.buildPhase)

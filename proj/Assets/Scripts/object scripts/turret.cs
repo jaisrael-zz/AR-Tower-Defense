@@ -45,7 +45,7 @@ public class turret : MonoBehaviour {
 		{
 			foreach(GameObject creep in GameObject.FindGameObjectsWithTag("Creep"))
 			{
-				float creepDist = Mathf.Pow((creep.transform.position.x-this.transform.position.x),2.0f)+Mathf.Pow((creep.transform.position.z-creep.transform.position.z),2.0f);
+				float creepDist = Mathf.Pow((creep.transform.position.x-this.transform.position.x),2.0f)+Mathf.Pow((creep.transform.position.z-this.transform.position.z),2.0f);
 				if(creepDist < (Mathf.Pow(range,2)))
 				{
 					float targetDist = Mathf.Pow((creep.transform.position.x-goalPos.x),2.0f)+Mathf.Pow((creep.transform.position.z-goalPos.y),2.0f);
