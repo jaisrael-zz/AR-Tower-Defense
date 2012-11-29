@@ -25,7 +25,7 @@ public class missile : MonoBehaviour {
 			if (creep != null)
 			{
 				float dFromCenter = Vector3.Distance(creep.transform.position,this.transform.position);
-				Debug.Log(dFromCenter);
+				//Debug.Log(dFromCenter);
 				if (dFromCenter < radius)
 				{
 					float splashDamage = ((radius - dFromCenter)/radius)*damage;
@@ -42,12 +42,14 @@ public class missile : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		float dt = Time.deltaTime;
+		if(target == null) Destroy(this.gameObject);
+		else {
+			Vector3 distance = target.position - this.transform.position;
+			Vector3 direction = distance/distance.magnitude;
+			Vector3 newPos = (direction * dt * speed);
 
-		Vector3 distance = target.position - this.transform.position;
-		Vector3 direction = distance/distance.magnitude;
-		Vector3 newPos = (direction * dt * speed);
-
-		if(newPos.magnitude > distance.magnitude) 	onHit();
-		else 	this.transform.position = this.transform.position + newPos;
+			if(newPos.magnitude > distance.magnitude) 	onHit();
+			else 	this.transform.position = this.transform.position + newPos;
+		}
 	}
 }
