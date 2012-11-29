@@ -9,6 +9,13 @@ public class goal : MonoBehaviour {
 		health -= damage;
 		if (health <= 0)
 		{
+			GameObject main = GameObject.FindWithTag("Main");
+			if(main != null)
+			{
+				gameManager gm = (gameManager)main.GetComponent("gameManager");
+				gm.lose();
+			}
+			else Debug.Log("very bad news, friend");
 			Destroy(this.gameObject);
 		}
 	}

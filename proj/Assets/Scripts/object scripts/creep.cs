@@ -39,8 +39,11 @@ public class creep : MonoBehaviour {
 	public void kamikaze()
 	{
 		GameObject g = GameObject.FindWithTag("Goal");
-		goal gscript = (goal)g.GetComponent("goal");
-		gscript.Hit(weight);
+		if(g != null) 
+		{
+			goal gscript = (goal)g.GetComponent("goal");
+			gscript.Hit(weight);
+		}
 		Destroy(this.gameObject);
 	}
 

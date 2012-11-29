@@ -47,6 +47,7 @@ public class missile : MonoBehaviour {
 			Vector3 distance = target.position - this.transform.position;
 			Vector3 direction = distance/distance.magnitude;
 			Vector3 newPos = (direction * dt * speed);
+			this.transform.LookAt(target.position);
 
 			if(newPos.magnitude > distance.magnitude) 	onHit();
 			else 	this.transform.position = this.transform.position + newPos;

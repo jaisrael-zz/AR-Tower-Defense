@@ -140,6 +140,11 @@ public class gameManager : MonoBehaviour {
 		createGoal(goalPos);
 	}
 	
+	// game State Managers
+	public void lose () {
+		state = gameState.gameOver;
+	}
+
 	// Update is called once per frame
 	void Update () {
 
@@ -162,6 +167,10 @@ public class gameManager : MonoBehaviour {
 		else if((int)state == (int)gameState.buildPhase)
 		{
 			Debug.Log("Let's Build Yo");
+		}
+		else if((int)state == (int)gameState.gameOver)
+		{
+			Debug.Log("YOU LOSE");
 		}
 	}
 }
