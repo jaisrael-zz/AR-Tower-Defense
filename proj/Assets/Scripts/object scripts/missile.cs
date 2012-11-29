@@ -24,6 +24,12 @@ public class missile : MonoBehaviour {
 		{
 			float dFromCenter = Vector3.Distance(creep.transform.position,this.transform.position);
 			Debug.Log(dFromCenter);
+			if (dFromCenter < radius)
+			{
+				float splashDamage = ((radius - dFromCenter)/radius)*damage;
+				creep c = (creep)creep.GetComponent("creep");
+				c.hit(splashDamage);
+			}
 		}
 			
 

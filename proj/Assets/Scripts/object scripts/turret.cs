@@ -30,7 +30,7 @@ public class turret : MonoBehaviour {
 	{
 		GameObject newMissile = (GameObject)Instantiate(missileType,this.transform.position,this.transform.rotation);
 		missile m = (missile)newMissile.GetComponent("missile");
-		m.tag = "Missile";
+		newMissile.tag = "Missile";
 		m.target = targetCreep.transform;
 	}
 

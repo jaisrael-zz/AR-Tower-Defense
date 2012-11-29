@@ -5,7 +5,7 @@ public class creep : MonoBehaviour {
 
 	//instantiated in prefab
 	public int speed;
-	public int health;
+	public float health;
 	public int weight;
 
 	//instantiated upon creation
@@ -24,7 +24,12 @@ public class creep : MonoBehaviour {
 	}
 
 	//called on hit
-	void hit () {
-		
+	public void hit (float damage) {
+		health -= damage;
+		Debug.Log(health);
+		if (health < 0)
+		{
+			Destroy(this.gameObject);
+		}
 	}
 }
