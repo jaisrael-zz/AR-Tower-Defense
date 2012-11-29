@@ -22,13 +22,16 @@ public class missile : MonoBehaviour {
 		GameObject[] creeps = GameObject.FindGameObjectsWithTag("Creep");
 		foreach(GameObject creep in creeps)
 		{
-			float dFromCenter = Vector3.Distance(creep.transform.position,this.transform.position);
-			Debug.Log(dFromCenter);
-			if (dFromCenter < radius)
+			if (creep != null)
 			{
-				float splashDamage = ((radius - dFromCenter)/radius)*damage;
-				creep c = (creep)creep.GetComponent("creep");
-				c.hit(splashDamage);
+				float dFromCenter = Vector3.Distance(creep.transform.position,this.transform.position);
+				Debug.Log(dFromCenter);
+				if (dFromCenter < radius)
+				{
+					float splashDamage = ((radius - dFromCenter)/radius)*damage;
+					creep c = (creep)creep.GetComponent("creep");
+					c.hit(splashDamage);
+				}
 			}
 		}
 			

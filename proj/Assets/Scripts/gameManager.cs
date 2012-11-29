@@ -43,8 +43,8 @@ public class gameManager : MonoBehaviour {
 	//used for object creation
 	private int complexity;
 
-	private ArrayList turrets;
-	private ArrayList creeps;
+	//public ArrayList turrets;
+	//public ArrayList creeps;
 
 	/////////////////////////////////////////////////////
 
@@ -80,7 +80,7 @@ public class gameManager : MonoBehaviour {
 		GameObject newTurret = (GameObject)Instantiate(newTurretType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
 		newTurret.tag = "Turret";
 		//newTurret.GetComponent("Creep").gm = this.GetComponent("Game Manager");
-		turrets.Add(newTurret);
+		//turrets.Add(newTurret);
 	}
 
 	void createCreep(Vector2 gridPos, creepType type)
@@ -89,12 +89,13 @@ public class gameManager : MonoBehaviour {
 		GameObject newCreep = (GameObject)Instantiate(newCreepType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
 		//newCreep.GetComponent("Turret").gm = this.GetComponent("Game Manager");
 		newCreep.tag = "Creep";
-		creeps.Add(newCreep);
+		//creeps.Add(newCreep);
 	}
 
 	void Start () {
-		turrets = new ArrayList();
-		creeps = new ArrayList();
+		this.gameObject.tag = "Main";
+		//turrets = new ArrayList();
+		//creeps = new ArrayList();
 
 		grid = gc.createGameGrid();
 
@@ -102,15 +103,16 @@ public class gameManager : MonoBehaviour {
 
 		createTurret(new Vector2(5,5),turretType.basic);
 		createCreep(new Vector2(3,3),creepType.basic);
+		createCreep(new Vector2(6,4),creepType.basic);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
-		foreach(GameObject currentTurret in turrets)
+		foreach(GameObject currentTurret in GameObject.FindGameObjectsWithTag("Turret"))
 		{
 			turret t = (turret)currentTurret.GetComponent("turret");
-			t.Fire(creeps,new Vector2(10,10));
+			t.Fire(new Vector2(10,10));
 		}
 
 	}

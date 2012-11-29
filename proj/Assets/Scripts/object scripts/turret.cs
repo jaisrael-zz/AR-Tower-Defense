@@ -36,14 +36,14 @@ public class turret : MonoBehaviour {
 
 	// Fire is called through the gameManager's update, to easily supply the creep list and goal position
 	// current AI: fire at creep closest to goalPosition and within range
-	public void Fire (ArrayList creeps, Vector2 goalPos) {
+	public void Fire (Vector2 goalPos) {
 
 		GameObject target = null;
 		float minDist = 0;
 
 		if(timeSinceLastFire > rate)
 		{
-			foreach(GameObject creep in creeps)
+			foreach(GameObject creep in GameObject.FindGameObjectsWithTag("Creep"))
 			{
 				float creepDist = Mathf.Pow((creep.transform.position.x-this.transform.position.x),2.0f)+Mathf.Pow((creep.transform.position.z-creep.transform.position.z),2.0f);
 				if(creepDist < (Mathf.Pow(range,2)))
