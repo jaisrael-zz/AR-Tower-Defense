@@ -54,6 +54,9 @@ public class gameManager : MonoBehaviour {
 	public spawnManager sm;
 
 
+	//GUI Management
+	public guiManager gm;
+
 	/////////////////////////////////////////////////////
 	//Initialization
 
@@ -78,7 +81,7 @@ public class gameManager : MonoBehaviour {
 			default: break;
 		}
 		return basicCreep;
-	}
+	} 
 
 	//initializers for objects
 	//createss turret, and sets grid tile traversibility to false
@@ -216,4 +219,17 @@ public class gameManager : MonoBehaviour {
 			Debug.Log("YOU LOSE");
 		}
 	}
+
+	/////////////////////////////////////////////////////
+	void guiFun()
+	{
+		GUI.Label(new Rect(100,100,100,100),"Hello World!");
+	}
+	//GUI
+	void OnGUI()
+	{
+		//guiFun();
+	}
+
+
 }
