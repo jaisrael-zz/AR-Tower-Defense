@@ -36,7 +36,7 @@ public class gameManager : MonoBehaviour {
 	public GameObject goal;
 
 	//spawn point
-	//public GameObject spawn;
+	public GameObject spawn;
 
 	/////////////////////////////////////////////////////
 
@@ -46,12 +46,14 @@ public class gameManager : MonoBehaviour {
 	private bool[,] traversible;
 
 	//used for object creation
+	private int wave;
 	private int complexity;
 
 	//public ArrayList turrets;
 	//public ArrayList creeps;
 
 	public Vector2 goalPos;
+	public Vector2 spawnPos;
 
 	/////////////////////////////////////////////////////
 
@@ -109,6 +111,13 @@ public class gameManager : MonoBehaviour {
 		newGoal.tag = "Goal";
 	}
 
+	//creates spawn
+	void createSpawn(Vector2 gridPos)
+	{
+		GameObject newSpawn = (GameObject)Instantiate(spawn,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
+		newSpawn.tag = "Spawn";
+	}
+
 	void Start () {
 
 		state = gameState.battlePhase;
@@ -117,6 +126,7 @@ public class gameManager : MonoBehaviour {
 		//turrets = new ArrayList();
 		//creeps = new ArrayList();
 
+		//base environment
 		grid = gc.createGameGrid();
 		traversible = new bool[gc.gridWidth,gc.gridHeight];
 		for(int i = 0; i < gc.gridWidth; i++)
@@ -124,7 +134,12 @@ public class gameManager : MonoBehaviour {
 				traversible[i,j] = true;
 
 		goalPos = new Vector2(gc.gridWidth-1,gc.gridHeight-1);
+		spawnPos = new Vector2(0,0);
 
+		createGoal(goalPos);
+		createSpawn(spawnPos);
+
+		wave = 1;
 		complexity = 10;	
 
 		//test environment
@@ -137,7 +152,7 @@ public class gameManager : MonoBehaviour {
 		createCreep(new Vector2(1,5),creepType.basic);
 		createCreep(new Vector2(2,5),creepType.basic);
 
-		createGoal(goalPos);
+
 	}
 	
 	// game State Managers
