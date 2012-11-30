@@ -8,7 +8,7 @@ CXXFLAGS += `pkg-config opencv --cflags`
 LDFLAGS += -lm `pkg-config opencv --libs`
 
 #Name your target executables here
-all = DisplayImage SaveImage test Capture scan
+all = DisplayImage SaveImage test Capture scan mask	
 
 all: $(all)
 
@@ -28,6 +28,10 @@ Capture:
 
 scan: 
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ scan_image.cpp
+
+
+mask: 
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ mat_mask_operations.cpp
 
 clean:
 	rm -f $(all) *.o

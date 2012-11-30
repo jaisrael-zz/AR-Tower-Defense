@@ -14,10 +14,10 @@ int main( int argc, char** argv )
     }
 
     Mat image;
-	//CV_LOAD_IMAGE_COLOR (<0)
+	//CV_LOAD_IMAGE_UNCHANGED (<0)
 	//CV_LOAD_IMAGE_GRAYSCALE (0)
 	//CV_LOAD_IMAGE_COLOR (>0)
-    image = imread(argv[1], 1);//CV_LOAD_IMAGE_COLOR);	// Read the file
+    image = imread(argv[1], -1);//CV_LOAD_IMAGE_COLOR);	// Read the file
 
     if(! image.data )                              // Check for invalid input
     {
@@ -28,8 +28,8 @@ int main( int argc, char** argv )
 	Mat M(200, 200, CV_8UC3, Scalar(255,0,0));
 
     namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
-    //imshow( "Display window", image );                   // Show our image inside it.
-    imshow( "Display window", M );                   // Show our image inside it.
+    imshow( "Display window", image );                   // Show our image inside it.
+    //imshow( "Display window", M );                   // Show our image inside it.
 
     waitKey(0);											 // Wait for a keystroke in the window
 
