@@ -16,11 +16,11 @@ public class spawnManager : MonoBehaviour {
 	public gameManager gm;
 
 	public int currentWave;
-	private int currentWaveIndex;
-	private float totaldt;
+	public int currentWaveIndex;
+	public float totaldt;
 	private bool waveFinishedSpawning;
 
-	private wave[] allWaves;
+	public wave[] allWaves;
 
 
 	public bool isWaveDefeated()
