@@ -9,7 +9,7 @@ public class goal : MonoBehaviour {
 		health -= damage;
 		if (health <= 0)
 		{
-			GameObject main = GameObject.FindWithTag("Main");
+			GameObject main = GameObject.FindWithTag("MainCamera");
 			if(main != null)
 			{
 				gameManager gm = (gameManager)main.GetComponent("gameManager");

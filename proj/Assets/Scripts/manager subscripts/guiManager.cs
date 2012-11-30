@@ -67,7 +67,6 @@ public class guiManager : MonoBehaviour {
 
 		//Top-Left Button
 		//Pauses/Resumes the game
-		Debug.Log(GUI.skin);
 		GUI.skin = buttonSkin;
 		if(gm.state == gameState.buildPhase || gm.state == gameState.paused)
 		{		

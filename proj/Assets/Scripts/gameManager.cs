@@ -123,7 +123,9 @@ public class gameManager : MonoBehaviour {
 
 		state = gameState.battlePhase;
 
-		this.gameObject.tag = "Main";
+		//Debug.Log(this.gameObject.tag);
+
+		//this.gameObject.tag = "Main";
 		//turrets = new ArrayList();
 		//creeps = new ArrayList();
 

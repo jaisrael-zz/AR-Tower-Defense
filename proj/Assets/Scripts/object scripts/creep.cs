@@ -29,9 +29,6 @@ public class creep : MonoBehaviour {
 		//Debug.Log(health);
 		if (health < 0)
 		{
-			//GameObject maincam = GameObject.FindWithTag("Main");
-			//gameManager gm = (gameManager)(maincam.GetComponent("gameManager"));
-			//gm.creeps.Remove(this.gameObject);
 			Destroy(this.gameObject);
 		}
 	}
