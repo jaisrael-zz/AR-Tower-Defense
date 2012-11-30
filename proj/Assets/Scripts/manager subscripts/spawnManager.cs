@@ -15,7 +15,7 @@ public class spawnManager : MonoBehaviour {
 	public int totalWaves;
 	public gameManager gm;
 
-	private int currentWave;
+	public int currentWave;
 	private int currentWaveIndex;
 	private float totaldt;
 	private bool waveFinishedSpawning;

@@ -2,12 +2,11 @@ using UnityEngine;
 using System.Collections;
 
 public enum gameState {
-	titleScreen,
-	loadScreen,
 	buildPhase,
 	battlePhase,
 	paused,
-	gameOver
+	gameOver,
+	gameWon
 };
 //possible turrets
 public enum turretType {
@@ -172,6 +171,10 @@ public class gameManager : MonoBehaviour {
 		state = gameState.buildPhase;
 	}
 
+	public void totalWin () {
+		state = gameState.gameWon;
+	}
+
 	public void beginWave () {
 		state = gameState.battlePhase;
 	}
@@ -214,7 +217,8 @@ public class gameManager : MonoBehaviour {
 				Debug.Log("here");
 				if(sm.isWaveDefeated())
 				{
-					win();
+					if(sm.currentWave == sm.totalWaves) totalWin();
+					else win();
 				}
 			}
 		}
