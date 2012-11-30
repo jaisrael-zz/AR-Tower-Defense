@@ -1,7 +1,6 @@
 #Compile and link flags
 CXX = g++
 CFLAGS = -Wall -g
-EXE = DisplayImage SaveImage test Capture scan
 #Compilation
 CXXFLAGS += `pkg-config opencv --cflags`
 
@@ -9,7 +8,7 @@ CXXFLAGS += `pkg-config opencv --cflags`
 LDFLAGS += -lm `pkg-config opencv --libs`
 
 #Name your target executables here
-all = $(EXE)
+all = DisplayImage SaveImage test Capture scan
 
 all: $(all)
 

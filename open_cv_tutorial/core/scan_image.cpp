@@ -69,7 +69,15 @@ int main( int argc, char* argv[])
         cv::Mat clone_i = I.clone();
         J = ScanImageAndReduceC(clone_i, table);
     }
+/*
+    namedWindow( "Display window", CV_WINDOW_AUTOSIZE );
+	imshow( "Display window", J);
+	
 
+    namedWindow( "Display window2", CV_WINDOW_AUTOSIZE );
+	imshow( "Display window2", I);
+	waitKey(0);
+  */  
     t = 1000*((double)getTickCount() - t)/getTickFrequency();
     t /= times;
 
@@ -121,9 +129,6 @@ int main( int argc, char* argv[])
         << times << " runs): " << t << " milliseconds."<< endl;
 
 
-    namedWindow( "Display window", CV_WINDOW_AUTOSIZE );
-	imshow( "Display window", J);
-	waitKey(0);
 	
 	return 0;
 }
