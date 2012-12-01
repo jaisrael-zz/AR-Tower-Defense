@@ -17,7 +17,7 @@ public class touchManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	
-	}
+	} 
 	
 	// Update is called once per frame
 	void Update () {
@@ -29,15 +29,13 @@ public class touchManager : MonoBehaviour {
 			//cast the ray and return true if it collided with some GameObject's collider component
 			if (Physics.Raycast(ray, out hitInfo))
 			{
-				//when Physics.Raycast succeeds, it fill out the hitInfo object
-				//get the GameObject that the collider belongs to
-				selectedObject = hitInfo.collider.gameObject;
-				//print out the GameObject's name
-				//Debug.Log(selectedObject.transform.parent.gameObject.tag);
+				//we know that if the ray collides with something we want, it is the component
+				//of an overall object (ie the ray hits turretBody, part of a Turret gameObject)
+				selectedObject = hitInfo.collider.gameObject.transform.parent.gameObject;
 
-				if(selectedObject.transform.parent.gameObject.tag == "Tile") selected = selectedState.tile;
-				if(selectedObject.transform.parent.gameObject.tag == "Turret") selected = selectedState.turret;
-				if(selectedObject.transform.parent.gameObject.tag == "Creep") selected = selectedState.creep;
+				if(selectedObject.tag == "Tile") selected = selectedState.tile;
+				if(selectedObject.tag == "Turret") selected = selectedState.turret;
+				if(selectedObject.tag == "Creep") selected = selectedState.creep;
 			}
 			else 
 			{
