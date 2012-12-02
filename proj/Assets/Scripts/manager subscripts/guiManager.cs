@@ -182,7 +182,7 @@ public class guiManager : MonoBehaviour {
 					if(i != 0 || j != 0)
 					{
 						 int typeIndex = (i+1)+((j+1)*3);
-						 Rect buttonRect = new Rect(tm.selectedPos.x + (selectionOffset*i) - (buttonSize/2),Screen.height-tm.selectedPos.y + (selectionOffset*j) - (buttonSize/2),selectionButtonSize,selectionButtonSize);
+						 Rect buttonRect = new Rect(tm.selectedPos.x + (selectionOffset*i) - (buttonSize/2) ,Screen.height-tm.selectedPos.y + (selectionOffset*j) - (buttonSize/2),selectionButtonSize,selectionButtonSize);
 						 if(typeIndex < System.Enum.GetNames(typeof(turretType)).Length)
 						 {
 						 	if (GUI.Button(buttonRect,typeToTurretImage((turretType)typeIndex)))
