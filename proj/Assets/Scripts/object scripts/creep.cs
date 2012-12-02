@@ -7,6 +7,7 @@ public class creep : MonoBehaviour {
 	public int speed;
 	public float health;
 	public int weight;
+	public Texture image;
 
 	//instantiated upon creation
 	public GameObject target;

@@ -89,7 +89,7 @@ public class gameManager : MonoBehaviour {
 
 	//initializers for objects
 	//createss turret, and sets grid tile traversibility to false
-	void createTurret(Vector2 gridPos, turretType type)
+	public void createTurret(Vector2 gridPos, turretType type)
 	{
 		GameObject newTurretType = typeToTurret(type);
 		GameObject newTurret = (GameObject)Instantiate(newTurretType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
@@ -125,7 +125,7 @@ public class gameManager : MonoBehaviour {
 
 	void Start () {
 
-		state = gameState.battlePhase;
+		state = gameState.buildPhase;
 
 		//Debug.Log(this.gameObject.tag);
 

@@ -8,6 +8,7 @@ public class turret : MonoBehaviour {
 	public GameObject missileType;	//missile type created on fire
 	public float rate;				//fire rate
 	public float range;				//fire range
+	public Texture image;			//turret image
 
 	//instantiated upon creation (gameManager.cs)
 	//public gameManager gm;			//gets other object and game data

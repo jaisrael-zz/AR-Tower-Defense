@@ -6,6 +6,7 @@ public class guiManager : MonoBehaviour {
 	//scripts (to access certain variables)
 	public gameManager gm;		//need current game state
 	public spawnManager sm;		//need current wave information
+	public touchManager tm;		//need current selected state
 
 	//textures
 	public Texture playButtonTexture;
@@ -29,11 +30,45 @@ public class guiManager : MonoBehaviour {
 	private int waveViewHeight;
 	private int waveViewVertOffset;
 	private int waveContentOffset;
+	private int waveContentInitial;
 
 	private int exitWindowWidth;
 	private int exitWindowHeight;
 	private bool renderExitWindow;
 	private gameState prevState;
+
+	private int selectionOffset;
+	private int selectionButtonSize;
+
+/*
+	private int buildViewWidth;
+	private int buildViewHeight;
+	private int buildContentOffset;
+	private int buildContentWidth;
+	*/
+
+	//type conversion methods
+	Texture typeToTurretImage(turretType type)
+	{
+		switch ((int)type)
+		{
+			case 0: return basicTurretImage;
+
+			default: break;
+		}
+		return basicTurretImage;
+	}
+
+	Texture typeToCreepImage(creepType type)
+	{
+		switch ((int)type)
+		{
+			case 0: return basicCreepImage;
+
+			default: break;
+		}
+		return basicCreepImage;
+	} 
 
 	// Use this for initialization
 	void Start () {
@@ -43,12 +78,23 @@ public class guiManager : MonoBehaviour {
 		waveViewWidth = 400;
 		waveViewHeight = 150;
 		waveViewVertOffset = 10;
-		waveContentOffset = 100;
+		waveContentOffset = 60;
+		waveContentInitial = 120;
 
 		exitWindowWidth = 200;
 		exitWindowHeight = 100;
 		renderExitWindow = false;
 		prevState = (gameState)0;
+/*
+		buildViewWidth = 500;
+		buildViewHeight = 150;
+		buildContentOffset = 10;
+		buildContentWidth = 80;
+		*/
+
+		selectionOffset = 60;
+		selectionButtonSize = 50;
+
 	}
 	
 	// Update is called once per frame
@@ -92,13 +138,10 @@ public class guiManager : MonoBehaviour {
 			Rect waveViewRect = new Rect((Screen.width-waveViewWidth)/2,waveViewVertOffset,waveViewWidth,waveViewHeight);
 			waveViewVector = GUI.BeginScrollView(waveViewRect,waveViewVector,new Rect(0,0,waveViewWidth,waveViewHeight));
 			
-			GUI.Label(new Rect(0,0,100,50),("Wave " + sm.currentWave.ToString() + " Up Next: "));
-			if(sm.currentWaveIndex < sm.allWaves[sm.currentWave].waveSize) 
-				GUI.Label(new Rect(120,0,50,50),basicCreepImage);
-			if(sm.currentWaveIndex+1 < sm.allWaves[sm.currentWave].waveSize) 
-				GUI.Label(new Rect(180,0,50,50),basicCreepImage);
-			if(sm.currentWaveIndex+2 < sm.allWaves[sm.currentWave].waveSize) 
-				GUI.Label(new Rect(240,0,50,50),basicCreepImage);
+			GUI.Label(new Rect(0,0,100,50),("Wave " + (sm.currentWave+1).ToString() + " Up Next: "));
+			for(int i = 0; i < 2; i++)
+				if(sm.currentWaveIndex+i < sm.allWaves[sm.currentWave].waveSize) 
+					GUI.Label(new Rect(waveContentInitial + (i*waveContentOffset),0,50,50),typeToCreepImage((creepType)sm.allWaves[sm.currentWave].creepIDs[sm.currentWaveIndex]));
 			
 			GUI.EndScrollView();
 		}
@@ -116,8 +159,46 @@ public class guiManager : MonoBehaviour {
 		if(renderExitWindow)
 		{
 			Rect exitWindowRect = new Rect((Screen.width-exitWindowWidth)/2,(Screen.height-exitWindowHeight)/2,exitWindowWidth,exitWindowHeight);
-			exitWindowRect = GUI.Window(0, exitWindowRect,exitWindow,"Are You Sure?");
+			exitWindowRect = GUI.Window(0, exitWindowRect,exitWindow,"Return to Main Menu?");
 		}
+
+
+		//turret build menu
+		if(tm.selected == selectedState.tile)
+		{
+			/*Debug.Log(Screen.height);
+			Vector2 buildViewVector = new Vector2(0,0);
+			Rect buildViewRect = new Rect((Screen.width-buildViewWidth)/2,(Screen.height-buildViewHeight),buildViewWidth,buildViewHeight); 
+			buildViewVector = GUI.BeginScrollView(buildViewRect,buildViewVector, new Rect(0,0,buildViewWidth, buildViewHeight));
+
+			GUI.Label(new Rect(0,0,100,50),"Build!");
+
+			GUI.EndScrollView();
+			*/
+			for(int i = -1; i <= 1; i++)
+			{
+				for(int j = -1; j <= 1; j++)
+				{
+					if(i != 0 || j != 0)
+					{
+						 int typeIndex = (i+1)+((j+1)*3);
+						 Rect buttonRect = new Rect(tm.selectedPos.x + (selectionOffset*i),Screen.height-tm.selectedPos.y + (selectionOffset*j),selectionButtonSize,selectionButtonSize);
+						 if(typeIndex < System.Enum.GetNames(typeof(turretType)).Length)
+						 {
+						 	if (GUI.Button(buttonRect,typeToTurretImage((turretType)typeIndex)))
+						 	{
+						 		//set turret
+						 		gm.createTurret(new Vector2(tm.selectedObject.transform.position.x,tm.selectedObject.transform.position.z),(turretType)typeIndex);
+						 		tm.clickable = true;
+						 		tm.selected = selectedState.none;
+						 	}
+						 }
+						 else if(GUI.Button(buttonRect,"")) {tm.clickable = true;  tm.selected = selectedState.none;}
+					}
+				}
+			}
+		}
+		if(tm.selected == selectedState.turret) tm.clickable = true;
 	}
 
 	void exitWindow(int windowID)
