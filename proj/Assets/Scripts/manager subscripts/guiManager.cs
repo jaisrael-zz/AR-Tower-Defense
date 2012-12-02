@@ -105,12 +105,12 @@ public class guiManager : MonoBehaviour {
 	void OnGUI()
 	{
 		//Debugging Label
-		if(gm.state == gameState.buildPhase) GUI.Label(new Rect(100,100,100,100),"Let's Build Yo!");
+		/*if(gm.state == gameState.buildPhase) GUI.Label(new Rect(100,100,100,100),"Let's Build Yo!");
 		else if(gm.state == gameState.battlePhase) GUI.Label(new Rect(100,100,100,100),"Let's Fight Yo!");
 		else if(gm.state == gameState.paused) GUI.Label(new Rect(100,100,100,100),"Paused!");
 		else if(gm.state == gameState.gameOver) GUI.Label(new Rect(100,100,100,100),"You Lose!");
 		else if(gm.state == gameState.gameWon) GUI.Label(new Rect(100,100,100,100),"You Win!");
-
+*/
 		//Top-Left Button
 		//Pauses/Resumes the game
 		GUI.skin = buttonSkin;
@@ -182,7 +182,7 @@ public class guiManager : MonoBehaviour {
 					if(i != 0 || j != 0)
 					{
 						 int typeIndex = (i+1)+((j+1)*3);
-						 Rect buttonRect = new Rect(tm.selectedPos.x + (selectionOffset*i),Screen.height-tm.selectedPos.y + (selectionOffset*j),selectionButtonSize,selectionButtonSize);
+						 Rect buttonRect = new Rect(tm.selectedPos.x + (selectionOffset*i) - (buttonSize/2),Screen.height-tm.selectedPos.y + (selectionOffset*j) - (buttonSize/2),selectionButtonSize,selectionButtonSize);
 						 if(typeIndex < System.Enum.GetNames(typeof(turretType)).Length)
 						 {
 						 	if (GUI.Button(buttonRect,typeToTurretImage((turretType)typeIndex)))
