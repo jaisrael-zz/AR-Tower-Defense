@@ -3,6 +3,8 @@ using System.Collections;
 
 public class mainMenuManager : MonoBehaviour {
 
+	public GUIStyle titleStyle;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -14,11 +16,14 @@ public class mainMenuManager : MonoBehaviour {
 	}
 
 	void OnGUI () {
-		if (GUI.Button( new Rect((Screen.width/2)-70,(Screen.height/2)-70,140,140),"Play"))
+
+		GUI.Label(new Rect(0,0,Screen.width,100),"AR Tower Defense",titleStyle);
+
+		if (GUI.Button( new Rect((Screen.width/2)-20,(Screen.height/2)-50,40,20),"Play"))
 		{
 			Application.LoadLevel("main");
 		}
-		if (GUI.Button( new Rect((Screen.width/2)-70,(Screen.height/2)-280,140,140),"Quit"))
+		if (GUI.Button( new Rect((Screen.width/2)-20,(Screen.height/2)-10,40,20),"Quit"))
 		{
 			Application.Quit();
 		}

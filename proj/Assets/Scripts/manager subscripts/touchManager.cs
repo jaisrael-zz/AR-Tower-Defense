@@ -43,7 +43,7 @@ public class touchManager : MonoBehaviour {
 					}
 					if(selectedObject.tag == "Turret" && selected == selectedState.none) {
 						selected = selectedState.turret;
-						clickable = false;
+						//clickable = false;
 					}
 					if(selectedObject.tag == "Creep" && selected == selectedState.none) selected = selectedState.creep;
 				}
