@@ -151,9 +151,16 @@ public class guiManager : MonoBehaviour {
 		GUI.skin = buttonSkin;
 		if(GUI.Button(new Rect(Screen.width-buttonSize-buttonOffset,buttonOffset,buttonSize,buttonSize),exitButtonTexture))
 		{
-			renderExitWindow = true;
-			prevState = gm.state;
-			gm.state = gameState.paused;
+			if(gm.state == gameState.gameWon)
+			{
+				Application.LoadLevel("VictoryScreen");
+			}
+			else
+			{
+				renderExitWindow = true;
+				prevState = gm.state;
+				gm.state = gameState.paused;
+			}
 		}
 		GUI.skin = null;
 		if(renderExitWindow)
