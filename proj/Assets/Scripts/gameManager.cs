@@ -42,20 +42,24 @@ public class gameManager : MonoBehaviour {
 	//makes game grid
 	public gridCreator gc;
 	private GameObject[,] grid;
-	private bool[,] traversible;
+	public bool[,] traversible;
 
 	//public ArrayList turrets;
 	//public ArrayList creeps;
 
 	public Vector2 goalPos;
 
+	public GameObject selectedTile;
+
 	/////////////////////////////////////////////////////
 	//Spawn Management
 	public spawnManager sm;
 
-
 	//GUI Management
 	public guiManager gm;
+
+	//Touch Management
+	public touchManager tm;
 
 	/////////////////////////////////////////////////////
 	//Initialization
@@ -85,7 +89,7 @@ public class gameManager : MonoBehaviour {
 
 	//initializers for objects
 	//createss turret, and sets grid tile traversibility to false
-	void createTurret(Vector2 gridPos, turretType type)
+	public void createTurret(Vector2 gridPos, turretType type)
 	{
 		GameObject newTurretType = typeToTurret(type);
 		GameObject newTurret = (GameObject)Instantiate(newTurretType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
@@ -121,9 +125,11 @@ public class gameManager : MonoBehaviour {
 
 	void Start () {
 
-		state = gameState.battlePhase;
+		state = gameState.buildPhase;
 
-		this.gameObject.tag = "Main";
+		//Debug.Log(this.gameObject.tag);
+
+		//this.gameObject.tag = "Main";
 		//turrets = new ArrayList();
 		//creeps = new ArrayList();
 
@@ -225,22 +231,24 @@ public class gameManager : MonoBehaviour {
 		else if((int)state == (int)gameState.buildPhase)
 		{
 			//Debug.Log("Let's Build Yo");
+			if(tm.selected == selectedState.turret)
+			{
+
+			}
+			else if(tm.selected == selectedState.tile)
+			{
+
+			}
+			else if(tm.selected == selectedState.creep)
+			{
+				//apply stun 
+			}
+
 		}
 		else if((int)state == (int)gameState.gameOver)
 		{
 			//Debug.Log("YOU LOSE");
 		}
-	}
-
-	/////////////////////////////////////////////////////
-	void guiFun()
-	{
-		GUI.Label(new Rect(100,100,100,100),"Hello World!");
-	}
-	//GUI
-	void OnGUI()
-	{
-		//guiFun();
 	}
 
 

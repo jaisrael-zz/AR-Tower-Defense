@@ -24,6 +24,7 @@ public class gridCreator : MonoBehaviour {
 			{
 				GameObject tile = (GameObject)Instantiate(gridTile);
 				tile.transform.position = new Vector3(i,0,j);
+				tile.tag = "Tile";
 
 				grid[i,j] = tile;
 			}

@@ -7,6 +7,7 @@ public class creep : MonoBehaviour {
 	public int speed;
 	public float health;
 	public int weight;
+	public Texture image;
 
 	//instantiated upon creation
 	public GameObject target;
@@ -29,9 +30,6 @@ public class creep : MonoBehaviour {
 		//Debug.Log(health);
 		if (health < 0)
 		{
-			//GameObject maincam = GameObject.FindWithTag("Main");
-			//gameManager gm = (gameManager)(maincam.GetComponent("gameManager"));
-			//gm.creeps.Remove(this.gameObject);
 			Destroy(this.gameObject);
 		}
 	}
