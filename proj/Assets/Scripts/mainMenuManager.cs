@@ -17,13 +17,13 @@ public class mainMenuManager : MonoBehaviour {
 
 	void OnGUI () {
 
-		GUI.Label(new Rect(0,0,Screen.width,100),"AR Tower Defense",titleStyle);
+		GUI.Label(new Rect(0,0,Screen.width,100),"AR TOWER DEFENSE",titleStyle);
 
-		if (GUI.Button( new Rect((Screen.width/2)-20,(Screen.height/2)-50,40,20),"Play"))
+		if (GUI.Button( new Rect((Screen.width/2)-50,(Screen.height/2)-50,100,60),"play",titleStyle))
 		{
 			Application.LoadLevel("main");
 		}
-		if (GUI.Button( new Rect((Screen.width/2)-20,(Screen.height/2)-10,40,20),"Quit"))
+		if (GUI.Button( new Rect((Screen.width/2)-50,(Screen.height/2)+30,100,60),"quit",titleStyle))
 		{
 			Application.Quit();
 		}
