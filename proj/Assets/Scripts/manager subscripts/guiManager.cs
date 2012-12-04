@@ -148,6 +148,10 @@ public class guiManager : MonoBehaviour {
 			
 			GUI.EndScrollView();
 		}
+		else
+		{
+			GUI.Label(new Rect(0,buttonOffset,100,50),("ALL WAVES CLEARED!"));
+		}
 
 		//Top-Right Button
 		//pulls up game exit window
