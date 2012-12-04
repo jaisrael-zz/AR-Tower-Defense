@@ -5,7 +5,8 @@ public class GameLevel : MonoBehaviour {
 
 	void OnLevelWasLoaded(int level)
 	{
-		Debug.Log(level);
+		Texture fader = Resources.Load("empty") as Texture;
+		Debug.Log(fader);
 	}
 
 /*	// Use this for initialization

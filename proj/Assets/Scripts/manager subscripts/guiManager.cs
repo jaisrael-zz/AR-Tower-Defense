@@ -22,6 +22,9 @@ public class guiManager : MonoBehaviour {
 	//GUISkins
 	public GUISkin buttonSkin;
 
+	//GUIStyles
+	public GUIStyle mainstyle;
+
 	//size variables
 	private int buttonSize;
 	private int buttonOffset;
@@ -78,7 +81,7 @@ public class guiManager : MonoBehaviour {
 		waveViewWidth = 400;
 		waveViewHeight = 150;
 		waveViewVertOffset = 10;
-		waveContentOffset = 60;
+		waveContentOffset = 50;
 		waveContentInitial = 120;
 
 		exitWindowWidth = 200;
@@ -128,7 +131,7 @@ public class guiManager : MonoBehaviour {
 				gm.state = gameState.paused;
 			}
 		}
-		GUI.skin = null;
+		//GUI.skin = null;
 
 		//Top-Center (Wave Information)
 		//Very Ugly ><
@@ -138,17 +141,17 @@ public class guiManager : MonoBehaviour {
 			Rect waveViewRect = new Rect((Screen.width-waveViewWidth)/2,waveViewVertOffset,waveViewWidth,waveViewHeight);
 			waveViewVector = GUI.BeginScrollView(waveViewRect,waveViewVector,new Rect(0,0,waveViewWidth,waveViewHeight));
 			
-			GUI.Label(new Rect(0,0,100,50),("Wave " + (sm.currentWave+1).ToString() + " Up Next: "));
+			GUI.Label(new Rect(0,buttonOffset,100,50),("WAVE " + (sm.currentWave+1).ToString() + "\n" + " UP NEXT: "));
 			for(int i = 0; i < 2; i++)
 				if(sm.currentWaveIndex+i < sm.allWaves[sm.currentWave].waveSize) 
-					GUI.Label(new Rect(waveContentInitial + (i*waveContentOffset),0,50,50),typeToCreepImage((creepType)sm.allWaves[sm.currentWave].creepIDs[sm.currentWaveIndex]));
+					GUI.Label(new Rect(waveContentInitial + (i*waveContentOffset),0,40,40),typeToCreepImage((creepType)sm.allWaves[sm.currentWave].creepIDs[sm.currentWaveIndex]));
 			
 			GUI.EndScrollView();
 		}
 
 		//Top-Right Button
 		//pulls up game exit window
-		GUI.skin = buttonSkin;
+		//GUI.skin = buttonSkin;
 		if(GUI.Button(new Rect(Screen.width-buttonSize-buttonOffset,buttonOffset,buttonSize,buttonSize),exitButtonTexture))
 		{
 			if(gm.state == gameState.gameWon)
@@ -162,17 +165,18 @@ public class guiManager : MonoBehaviour {
 				gm.state = gameState.paused;
 			}
 		}
-		GUI.skin = null;
+		//GUI.skin = null;
 		if(renderExitWindow)
 		{
 			Rect exitWindowRect = new Rect((Screen.width-exitWindowWidth)/2,(Screen.height-exitWindowHeight)/2,exitWindowWidth,exitWindowHeight);
-			exitWindowRect = GUI.Window(0, exitWindowRect,exitWindow,"Return to Main Menu?");
+			exitWindowRect = GUI.Window(0, exitWindowRect,exitWindow,"RETURN TO MAIN MENU?");
 		}
 
 		//Available Units
-		GUI.Label(new Rect(buttonOffset,buttonOffset+buttonSize+buttonOffset,100,50),"Units: "+gm.availableUnits.ToString());
+		GUI.Label(new Rect(buttonOffset,buttonOffset+buttonSize+buttonOffset,100,50),"UNITS: "+gm.availableUnits.ToString());
 
 		//turret build menu
+		GUI.skin = null;
 		if(tm.selected == selectedState.tile && gm.state == gameState.buildPhase)
 		{
 			/*Debug.Log(Screen.height);
@@ -213,11 +217,12 @@ public class guiManager : MonoBehaviour {
 
 	void exitWindow(int windowID)
 	{
-		if (GUI.Button(new Rect(80,25,40,20),"Yes"))
+		GUI.skin = buttonSkin;
+		if (GUI.Button(new Rect(80,25,40,20),"YES"))
 		{
 			Application.LoadLevel("StartMenu");
 		}
-		if (GUI.Button(new Rect(80,65,40,20),"No"))
+		if (GUI.Button(new Rect(80,65,40,20),"NO"))
 		{
 			renderExitWindow = false;
 			gm.state = prevState;

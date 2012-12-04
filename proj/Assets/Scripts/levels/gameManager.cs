@@ -159,6 +159,7 @@ public class gameManager : GameLevel {
 	// other things could happen though
 	public void lose () {
 		state = gameState.gameOver;
+		Application.LoadLevel("GameOver");
 	}
 
 	public void win () {
