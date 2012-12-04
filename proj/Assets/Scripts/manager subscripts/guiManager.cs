@@ -169,9 +169,11 @@ public class guiManager : MonoBehaviour {
 			exitWindowRect = GUI.Window(0, exitWindowRect,exitWindow,"Return to Main Menu?");
 		}
 
+		//Available Units
+		GUI.Label(new Rect(buttonOffset,buttonOffset+buttonSize+buttonOffset,100,50),"Units: "+gm.availableUnits.ToString());
 
 		//turret build menu
-		if(tm.selected == selectedState.tile)
+		if(tm.selected == selectedState.tile && gm.state == gameState.buildPhase)
 		{
 			/*Debug.Log(Screen.height);
 			Vector2 buildViewVector = new Vector2(0,0);
@@ -190,7 +192,8 @@ public class guiManager : MonoBehaviour {
 					{
 						 int typeIndex = (i+1)+((j+1)*3);
 						 Rect buttonRect = new Rect(tm.selectedPos.x + (selectionOffset*i) - (buttonSize/2) ,Screen.height-tm.selectedPos.y + (selectionOffset*j) - (buttonSize/2),selectionButtonSize,selectionButtonSize);
-						 if(typeIndex < System.Enum.GetNames(typeof(turretType)).Length)
+						 //need to change
+						 if(typeIndex < System.Enum.GetNames(typeof(turretType)).Length && gm.availableUnits > 0)
 						 {
 						 	if (GUI.Button(buttonRect,typeToTurretImage((turretType)typeIndex)))
 						 	{

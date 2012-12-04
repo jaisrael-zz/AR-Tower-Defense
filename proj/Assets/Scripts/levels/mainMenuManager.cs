@@ -1,9 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
-public class mainMenuManager : MonoBehaviour {
+public class mainMenuManager : GameLevel {
 
 	public GUIStyle titleStyle;
+
+	
 
 	// Use this for initialization
 	void Start () {

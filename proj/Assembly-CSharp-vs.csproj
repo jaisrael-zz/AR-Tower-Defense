@@ -44,8 +44,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\gameManager.cs" />
-     <Compile Include="Assets\Scripts\mainMenuManager.cs" />
+     <Compile Include="Assets\Scripts\gameLevel.cs" />
+     <Compile Include="Assets\Scripts\levels\gameManager.cs" />
+     <Compile Include="Assets\Scripts\levels\mainMenuManager.cs" />
+     <Compile Include="Assets\Scripts\levels\victoryManager.cs" />
      <Compile Include="Assets\Scripts\manager subscripts\gridCreator.cs" />
      <Compile Include="Assets\Scripts\manager subscripts\guiManager.cs" />
      <Compile Include="Assets\Scripts\manager subscripts\spawnManager.cs" />
@@ -54,7 +56,6 @@
      <Compile Include="Assets\Scripts\object scripts\goal.cs" />
      <Compile Include="Assets\Scripts\object scripts\missile.cs" />
      <Compile Include="Assets\Scripts\object scripts\turret.cs" />
-     <Compile Include="Assets\Scripts\victoryManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

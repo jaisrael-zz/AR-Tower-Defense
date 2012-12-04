@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class victoryManager : MonoBehaviour {
+public class victoryManager : GameLevel {
 
 	public GUIStyle titleStyle;
 

@@ -18,7 +18,7 @@ public enum creepType {
 }
 
 
-public class gameManager : MonoBehaviour {
+public class gameManager : GameLevel {
 
 	public gameState state;
 
@@ -126,6 +126,7 @@ public class gameManager : MonoBehaviour {
 		newSpawn.tag = "Spawn";
 	}
 
+
 	void Start () {
 
 		state = gameState.buildPhase;
@@ -147,22 +148,6 @@ public class gameManager : MonoBehaviour {
 
 		createGoal(goalPos);
 		createSpawn(sm.spawnPos);
-	
-
-		//test environment
-		createTurret(new Vector2(5,5),turretType.basic);
-		createTurret(new Vector2(7,5),turretType.basic);
-		createTurret(new Vector2(8,8),turretType.basic);
-		createTurret(new Vector2(1,1),turretType.basic);
-		createTurret(new Vector2(4,0),turretType.basic);
-		createTurret(new Vector2(4,1),turretType.basic);
-		createTurret(new Vector2(4,2),turretType.basic);
-
-		/*createCreep(new Vector2(3,3),creepType.basic);
-		createCreep(new Vector2(6,4),creepType.basic);
-		createCreep(new Vector2(1,5),creepType.basic);
-		createCreep(new Vector2(2,5),creepType.basic);
-*/
 
 	}
 	
