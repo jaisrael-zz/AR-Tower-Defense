@@ -19,11 +19,25 @@ static void onMouse(int event, int x, int y, int, void*)
 {
 	if (event != CV_EVENT_LBUTTONDOWN || clicks >= 4)
 		return;
-
+	Scalar color;
+	switch (clicks)
+	{
+		case 0:
+			color = Scalar(0,0,255);
+			break;
+		case 1:
+			color = Scalar(0,255,0);
+			break;
+		case 2:
+			color = Scalar(255,0,0);
+			break;
+		default:
+			color = Scalar(0,255,255);
+	}
 	Point center = Point(x,y);
 	im0_corners[clicks] = center; 
-	circle(image, center, 4, Scalar(0,0,255), -1); 
-
+	circle(image, center, 4, color, -1); 
+    cout << "(" << x << "," << y << ")" << endl;
 	clicks++;
 	
 }
@@ -157,14 +171,14 @@ int main(int argc, char* argv[])
 			imshow("Click Points", image);
 		}
 	}
-
+/*
 	cout << "Clicked Plane" << endl
 		 << "(x,y)" << endl 
 		 << "(" << im0_corners[0].x << "," << im0_corners[0].y << ")" << endl
 		 << "(" << im0_corners[1].x << "," << im0_corners[1].y << ")" << endl
 		 << "(" << im0_corners[2].x << "," << im0_corners[2].y << ")" << endl
 		 << "(" << im0_corners[3].x << "," << im0_corners[3].y << ")" << endl;
-
+*/
 
 	cout << "ITS HOMOGRAPHY TIME!" << endl;
 	//H_w^0 homography
@@ -187,6 +201,8 @@ int main(int argc, char* argv[])
 	double h1 = pow(KM.at<double>(0,0),2) + pow(KM.at<double>(1,0),2) +	pow(KM.at<double>(2,0),2);
 	double s = h2 / h1;
 
+	cout << "s = " << s << endl;
+	
     Mat scale = Mat::eye(3, 3, CV_64F);
 	scale.at<double>(1,1) = 1 / s;
 
@@ -220,6 +236,33 @@ int main(int argc, char* argv[])
 	Mat mp1 = (Mat_<double>(3,1) << 0, s, 1);
 	Mat mp2 = (Mat_<double>(3,1) << 1, s, 1);
 	Mat mp3 = (Mat_<double>(3,1) << 1, 0, 1);
+    Mat mp0_new = H_wi*mp0;
+	Point p0 = Point(mp0_new.at<double>(0) / mp0_new.at<double>(2),
+					 mp0_new.at<double>(1) / mp0_new.at<double>(2));
+    Mat mp1_new = H_wi*mp1;
+	Point p1 = Point(mp1_new.at<double>(0) / mp1_new.at<double>(2),
+					 mp1_new.at<double>(1) / mp1_new.at<double>(2));
+	Mat mp2_new = H_wi*mp2;
+	Point p2 = Point(mp2_new.at<double>(0) / mp2_new.at<double>(2),
+					 mp2_new.at<double>(1) / mp2_new.at<double>(2));
+	Mat mp3_new = H_wi*mp3;
+	Point p3 = Point(mp3_new.at<double>(0) / mp3_new.at<double>(2),
+					 mp3_new.at<double>(1) / mp3_new.at<double>(2));
+	cout << "Testing H_w0..." << endl;
+	circle(image, p0, 4, Scalar(255,255,255), -1); 
+	circle(image, p1, 4, Scalar(255,255,0), -1); 
+	circle(image, p2, 4, Scalar(0,0,0), -1); 
+	circle(image, p3, 4, Scalar(255,0,255), -1);
+	imshow("Click Points", image);
+	cout << "H_w0*p:" << endl
+		 << "(x,y)" << endl 
+		 << "(" << p0.x << "," << p0.y << ")" << endl
+		 << "(" << p1.x << "," << p1.y << ")" << endl
+		 << "(" << p2.x << "," << p2.y << ")" << endl
+		 << "(" << p3.x << "," << p3.y << ")" << endl;
+	waitKey(0);
+
+/* 
 	while (key != 'q')
 	{
 		cap >> image;
@@ -247,22 +290,22 @@ int main(int argc, char* argv[])
 
 		H_wi1 = H_ii1*H_wi;
 
-	    Mat mp0_new = H_wi1*mp0;
-		Point p0 = Point(mp0_new.at<double>(0) / mp0_new.at<double>(2),
-						 mp0_new.at<double>(1) / mp0_new.at<double>(2));
-	    Mat mp1_new = H_wi1*mp1;
-		Point p1 = Point(mp1_new.at<double>(0) / mp1_new.at<double>(2),
-						 mp1_new.at<double>(1) / mp1_new.at<double>(2));
-	    Mat mp2_new = H_wi1*mp2;
-		Point p2 = Point(mp2_new.at<double>(0) / mp2_new.at<double>(2),
-						 mp2_new.at<double>(1) / mp2_new.at<double>(2));
-	    Mat mp3_new = H_wi1*mp3;
-		Point p3 = Point(mp3_new.at<double>(0) / mp3_new.at<double>(2),
-						 mp3_new.at<double>(1) / mp3_new.at<double>(2));
+	    mp0_new = H_wi1*mp0;
+		p0 = Point(mp0_new.at<double>(0) / mp0_new.at<double>(2),
+				   mp0_new.at<double>(1) / mp0_new.at<double>(2));
+	    mp1_new = H_wi1*mp1;
+		p1 = Point(mp1_new.at<double>(0) / mp1_new.at<double>(2),
+				   mp1_new.at<double>(1) / mp1_new.at<double>(2));
+	    mp2_new = H_wi1*mp2;
+		p2 = Point(mp2_new.at<double>(0) / mp2_new.at<double>(2),
+				   mp2_new.at<double>(1) / mp2_new.at<double>(2));
+	    mp3_new = H_wi1*mp3;
+		p3 = Point(mp3_new.at<double>(0) / mp3_new.at<double>(2),
+				   mp3_new.at<double>(1) / mp3_new.at<double>(2));
 		circle(image, p0, 4, Scalar(0,0,255), -1); 
-		circle(image, p1, 4, Scalar(0,0,255), -1); 
-		circle(image, p2, 4, Scalar(0,0,255), -1); 
-		circle(image, p3, 4, Scalar(0,0,255), -1); 
+		circle(image, p1, 4, Scalar(0,255,0), -1); 
+		circle(image, p2, 4, Scalar(255,0,0), -1); 
+		circle(image, p3, 4, Scalar(0,255,255), -1); 
 		
         imshow("Click Points", image);
 		H_wi = H_wi1;
@@ -270,7 +313,9 @@ int main(int argc, char* argv[])
 		keypoints_0 = keypoints_1;
 		key = waitKey(30);
 	}
+*/
 	return 0;
+
 }
 
 
