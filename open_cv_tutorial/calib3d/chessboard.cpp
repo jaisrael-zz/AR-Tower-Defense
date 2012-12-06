@@ -46,8 +46,70 @@ static void onMouse2(int event, int x, int y, int, void*)
 {
 	return;
 }
+
+//transformation with perspective divide
+Point transform_corner(Mat H, Mat mp)
+{
+    Mat mp_new = H*mp;
+	Point p = Point(mp_new.at<double>(0) / mp_new.at<double>(2),
+					mp_new.at<double>(1) / mp_new.at<double>(2));
+	return p;
+}
+
+
+void drawPlane(Mat im, Point p0, Point p1, Point p2, Point p3)
+{ 
+	circle(image, p0, 4, Scalar(0,0,255), -1); 
+	circle(image, p1, 4, Scalar(0,255,0), -1); 
+	circle(image, p2, 4, Scalar(255,0,0), -1); 
+	circle(image, p3, 4, Scalar(0,255,255), -1); 
+
+}
+
+Mat find_next_homography(Mat image, Mat image_next, vector<KeyPoint> keypoints_0, Mat descriptors_0,
+						 SurfFeatureDetector detector, SurfDescriptorExtractor extractor, 
+						 BFMatcher matcher, vector<KeyPoint>& keypoints_next, Mat& descriptors_next)
+{
+
+	//step 1 detect feature points in next image
+	vector<KeyPoint> keypoints_1;
+	detector.detect(image_next, keypoints_1);
+
+	Mat img_keypoints_surf0, img_keypoints_surf1;
+	drawKeypoints(image, keypoints_0, img_keypoints_surf0);
+	drawKeypoints(image_next, keypoints_1, img_keypoints_surf1);
+
+	imshow("surf 0", img_keypoints_surf0);
+	imshow("surf 1", img_keypoints_surf1);
+
+    //step 2: extract feature descriptors from feature points
+	Mat descriptors_1;
+	extractor.compute(image_next, keypoints_1, descriptors_1);
+
+	//step 3: feature matching
+	//cout << "fd matching" << endl;
+	vector<DMatch> matches;
+	vector<Point2f> matched_0;
+	vector<Point2f> matched_1;
+
+	matcher.match(descriptors_0, descriptors_1, matches);
+	Mat img_feature_matches;
+	drawMatches(image, keypoints_0, image_next, keypoints_1, matches, img_feature_matches );
+	imshow("Matches", img_feature_matches);
+
+	for (int i = 0; i < matches.size(); i++ )
+	{
+		matched_0.push_back(keypoints_0[matches[i].queryIdx].pt);	
+		matched_1.push_back(keypoints_1[matches[i].trainIdx].pt);	
+	}
+	keypoints_next = keypoints_1;
+	descriptors_next = descriptors_1;
+	return findHomography(matched_0, matched_1, RANSAC);
+
+}
 int main(int argc, char* argv[])
 {
+	Mat image_next;
 	VideoCapture cap(0);
 	if(!cap.isOpened()) return -1;
 
@@ -68,8 +130,9 @@ int main(int argc, char* argv[])
 	cout << "Camera Calibration" << endl;
 	Size pattern(7,7);
 
-
+    
 	//calibrate camera
+	/*
 	vector<vector<Point3f> > object_points;
 	
 	vector<Point3f> obj;
@@ -89,17 +152,12 @@ int main(int argc, char* argv[])
 	{
 		cap >> image;
 		char key = waitKey(30);
-		/*bool valid = findChessboardCorners(image, pattern, corners, CALIB_CB_FAST_CHECK);
-		if (valid)
-			drawChessboardCorners(image, pattern, corners, true);
-		else
-			drawChessboardCorners(image, pattern, corners, false);*/
 		switch(key) {
 		case 27:
 			cout << "ESC was pressed" << endl;
 			if (num_images > 0) check = 0;
 			break;
-		case 'r':
+		case 'p':
 			if (findChessboardCorners(image, pattern, corners))
 			{
 				drawChessboardCorners(image, pattern, corners, true);
@@ -116,16 +174,7 @@ int main(int argc, char* argv[])
 		default:
 			imshow("Click Points", image);
 		}
-	    /*t2 = (double)getTickCount();
-		if ((((t2 - t) / getTickFrequency()) > 5) && valid )
-		{
-			cout << "added an image to the calibration" << endl;
-		    image_points.push_back(corners);
-			object_points.push_back(obj);
-			num_images++;
-			t = (double)getTickCount();
-			if (num_images > 10) check = 0;	
-		}	*/
+	    
 	}
     
     Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
@@ -139,7 +188,14 @@ int main(int argc, char* argv[])
 	cout << "Camera Matrix:" << endl << cameraMatrix << endl;
 	cout << "distCoeffs:" << endl << distCoeffs << endl;
 	cout << "reprojection error: " << rpe << endl;
-
+    */
+	Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
+	Mat distCoeffs = Mat::zeros(8, 1, CV_64F);
+	cameraMatrix.at<double>(0,0) = 805.681948728115;
+	cameraMatrix.at<double>(0,2) = 322.6647811002137;
+	cameraMatrix.at<double>(1,1) = 805.3642730837905;
+	cameraMatrix.at<double>(1,2) = 231.1740947838633;
+	double rpe = 0.273059;
 
 	check = 1;
 	cout << "Click 4 points of your plane" << endl;
@@ -154,7 +210,7 @@ int main(int argc, char* argv[])
 			cout << "ESC was pressed" << endl;
 			check = 0;
             break;
-		case 'r':
+		case 'p':
 			if (points_clicked)
 				break;	
 			clicks = 0;	
@@ -208,46 +264,20 @@ int main(int argc, char* argv[])
 
 	cout << "detect features points" << endl;
 	H_wi = H*scale;
-	check = 1;
-	//find H_wi using feature detection->feature descriptors->feature matching(RANSAC)
-	GoodFeaturesToTrackDetector detector(500, 0.1, 5);
-	//SurfFeatureDetector detector(400);
-	vector<KeyPoint> keypoints_0, keypoints_1;
-	detector.detect(image, keypoints_0);
-	
-	cout << "extract feature descriptors" << endl;
-	SurfDescriptorExtractor extractor;
-	Mat descriptors_0, descriptors_1;
-	extractor.compute(image, keypoints_0, descriptors_0);
-	
-	
-	cout << "fd matching" << endl;
-	FlannBasedMatcher matcher;
-	vector<DMatch> matches;
-	vector<DMatch> good_matches;
-	double min_dist = 10000, max_dist = 0;
-	vector<Point2f> matched_0;
-	vector<Point2f> matched_1;
-	Mat H_ii1;
-	Mat H_wi1;
-    char key = 0;
 
-	Mat mp0 = (Mat_<double>(3,1) << 0, 0, 1);
+	
+	//test H_w0
+    Mat mp0 = (Mat_<double>(3,1) << 0, 0, 1);
 	Mat mp1 = (Mat_<double>(3,1) << 0, s, 1);
 	Mat mp2 = (Mat_<double>(3,1) << 1, s, 1);
 	Mat mp3 = (Mat_<double>(3,1) << 1, 0, 1);
-    Mat mp0_new = H_wi*mp0;
-	Point p0 = Point(mp0_new.at<double>(0) / mp0_new.at<double>(2),
-					 mp0_new.at<double>(1) / mp0_new.at<double>(2));
-    Mat mp1_new = H_wi*mp1;
-	Point p1 = Point(mp1_new.at<double>(0) / mp1_new.at<double>(2),
-					 mp1_new.at<double>(1) / mp1_new.at<double>(2));
-	Mat mp2_new = H_wi*mp2;
-	Point p2 = Point(mp2_new.at<double>(0) / mp2_new.at<double>(2),
-					 mp2_new.at<double>(1) / mp2_new.at<double>(2));
-	Mat mp3_new = H_wi*mp3;
-	Point p3 = Point(mp3_new.at<double>(0) / mp3_new.at<double>(2),
-					 mp3_new.at<double>(1) / mp3_new.at<double>(2));
+
+	Point p0 = transform_corner(H_wi, mp0);
+	Point p1 = transform_corner(H_wi, mp1);
+	Point p2 = transform_corner(H_wi, mp2);
+	Point p3 = transform_corner(H_wi, mp3);
+
+
 	cout << "Testing H_w0..." << endl;
 	circle(image, p0, 4, Scalar(255,255,255), -1); 
 	circle(image, p1, 4, Scalar(255,255,0), -1); 
@@ -260,10 +290,143 @@ int main(int argc, char* argv[])
 		 << "(" << p1.x << "," << p1.y << ")" << endl
 		 << "(" << p2.x << "," << p2.y << ")" << endl
 		 << "(" << p3.x << "," << p3.y << ")" << endl;
-	waitKey(0);
+	check = 1;
 
-/* 
-	while (key != 'q')
+	
+	SurfFeatureDetector detector(400);
+    vector<KeyPoint> keypoints_0, keypoints_next;
+	detector.detect(image, keypoints_0);
+
+	SurfDescriptorExtractor extractor;
+	Mat descriptors_0, descriptors_next;
+	extractor.compute(image, keypoints_0, descriptors_0);
+
+	BFMatcher matcher( NORM_L2);
+/*	
+	//find H_wi using feature detection->feature descriptors->feature matching(RANSAC)
+
+	cap >> image_next;	
+	//step 1: detect keypoints
+	//GoodFeaturesToTrackDetector detector_good(500, 0.1, 5);
+	SurfFeatureDetector detector(400);
+	vector<KeyPoint> keypoints_0, keypoints_1, good_keypoints_0;
+	detector.detect(image, keypoints_0);
+	detector.detect(image_next, keypoints_1);
+	//detector_good.detect(image, good_keypoints_0);
+
+	Mat img_keypoints_surf0, img_keypoints_surf1;
+	drawKeypoints(image, keypoints_0, img_keypoints_surf0);
+	drawKeypoints(image_next, keypoints_1, img_keypoints_surf1);
+	//drawKeypoints(image, good_keypoints_0, img_keypoints_good);
+
+	imshow("surf 0", img_keypoints_surf0);
+	imshow("surf 1", img_keypoints_surf1);
+	//imshow("good 0", img_keypoints_good);
+
+	cout << "keypoint-surf0 #: " << keypoints_0.size() << endl;
+	cout << "keypoint-surf1 #: " << keypoints_1.size() << endl;
+	
+
+	//step 2: extract feature descriptors
+	cout << "extract feature descriptors" << endl;
+	SurfDescriptorExtractor extractor;
+	Mat descriptors_0, descriptors_1;
+	extractor.compute(image, keypoints_0, descriptors_0);
+	extractor.compute(image_next, keypoints_1, descriptors_1);
+	
+	
+
+	//step 3: feature matching
+	cout << "fd matching" << endl;
+	BFMatcher matcher( NORM_L2);
+	vector<DMatch> matches;
+	vector<DMatch> good_matches;
+	double min_dist = 10000, max_dist = 0;
+	vector<Point2f> matched_0;
+	vector<Point2f> matched_1;
+	Mat H_ii1;
+	Mat H_wi1;
+
+	matcher.match(descriptors_0, descriptors_1, matches);
+	Mat img_feature_matches;
+	drawMatches(image, keypoints_0, image_next, keypoints_1, matches, img_feature_matches );
+	imshow("Matches", img_feature_matches);
+
+	cout << "num matches: " << matches.size() << endl;
+	
+	for (int i = 0; i < matches.size(); i++ )
+	{
+		matched_0.push_back(keypoints_0[matches[i].queryIdx].pt);	
+		matched_1.push_back(keypoints_1[matches[i].trainIdx].pt);	
+	}
+	H_ii1 = findHomography(matched_0, matched_1, RANSAC);
+	H_wi1 = H_ii1 * H_wi;
+	Point p0_1 = transform_corner(H_wi1, mp0);
+	Point p1_1 = transform_corner(H_wi1, mp1);
+	Point p2_1 = transform_corner(H_wi1, mp2);
+	Point p3_1 = transform_corner(H_wi1, mp3);
+
+
+	drawPlane(image_next, p0_1, p1_1, p2_1, p3_1);
+	imshow("H_ii1", image_next);
+
+	
+	waitKey(0);
+*/
+	char key = 0;
+	Mat H_ii1, H_wi1;
+	Point p0_1, p1_1, p2_1, p3_1;
+	while (check)
+	{
+		key = waitKey(30);
+		switch(key) {
+		case 'q':
+			check = 0;
+			break;
+		case 'f':
+			cap >> image_next;
+			H_ii1 = find_next_homography(image, image_next, keypoints_0, descriptors_0,
+							detector, extractor, matcher, keypoints_next, descriptors_next);
+			H_wi1 = H_ii1 * H_wi;
+			p0_1 = transform_corner(H_wi1, mp0);
+			p1_1 = transform_corner(H_wi1, mp1);
+			p2_1 = transform_corner(H_wi1, mp2);
+			p3_1 = transform_corner(H_wi1, mp3);
+			
+			drawPlane(image_next, p0_1, p1_1, p2_1, p3_1);
+			imshow("H_ii1", image_next);
+			keypoints_0 = keypoints_next;
+			descriptors_0 = descriptors_next;
+			image = image_next; 
+			H_wi = H_wi1;
+		default:
+			break;
+		}
+			cap >> image_next;
+			H_ii1 = find_next_homography(image, image_next, keypoints_0, descriptors_0,
+							detector, extractor, matcher, keypoints_next, descriptors_next);
+			H_wi1 = H_ii1 * H_wi;
+			p0_1 = transform_corner(H_wi1, mp0);
+			p1_1 = transform_corner(H_wi1, mp1);
+			p2_1 = transform_corner(H_wi1, mp2);
+			p3_1 = transform_corner(H_wi1, mp3);
+			
+			drawPlane(image_next, p0_1, p1_1, p2_1, p3_1);
+			imshow("H_ii1", image_next);
+			keypoints_0 = keypoints_next;
+			descriptors_0 = descriptors_next;
+			image = image_next; 
+			H_wi = H_wi1;
+		 
+	}
+	//cap >> image;
+	//imshow("Click Points", image);
+	//waitKey(0);
+/*
+		
+    char key = 0;
+	check = 1;
+	while (key != 'q' && check)
 	{
 		cap >> image;
 		detector.detect(image, keypoints_1);
@@ -311,9 +474,10 @@ int main(int argc, char* argv[])
 		H_wi = H_wi1;
 		descriptors_0 = descriptors_1;
 		keypoints_0 = keypoints_1;
-		key = waitKey(30);
+		key = waitKey(0);
+		//check = 0;
 	}
-*/
+    waitKey(0);*/
 	return 0;
 
 }
