@@ -28,7 +28,7 @@
 -define:ENABLE_PROFILER
 -define:UNITY_EDITOR
 -define:UNITY_TEAM_LICENSE
-'Assets/Scripts/animation scripts/float.cs'
+'Assets/Scripts/animation scripts/floating.cs'
 'Assets/Scripts/gameLevel.cs'
 'Assets/Scripts/levels/gameManager.cs'
 'Assets/Scripts/levels/gameOverManager.cs'
@@ -36,6 +36,7 @@
 'Assets/Scripts/levels/victoryManager.cs'
 'Assets/Scripts/manager subscripts/gridCreator.cs'
 'Assets/Scripts/manager subscripts/guiManager.cs'
+'Assets/Scripts/manager subscripts/pathManager.cs'
 'Assets/Scripts/manager subscripts/spawnManager.cs'
 'Assets/Scripts/manager subscripts/touchManager.cs'
 'Assets/Scripts/object scripts/creep.cs'

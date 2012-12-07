@@ -1,6 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
+public enum creepStatus
+{
+	stun,
+	slow,
+	burn
+}
+
 public class creep : MonoBehaviour {
 
 	//instantiated in prefab
@@ -9,9 +16,17 @@ public class creep : MonoBehaviour {
 	public int weight;
 	public Texture image;
 
+	public float stunDurationMultiplier;
+	public float slowDurationMultiplier;
+	public float burnDurationMultiplier;
+
+	
+
 	//instantiated upon creation
 	public GameObject target;
 	//public gameManager gm;
+
+	private bool[] currentStatuses;
 
 	// Use this for initialization
 	void Start () {
@@ -49,6 +64,8 @@ public class creep : MonoBehaviour {
 	{
 		return new Vector2(Mathf.Floor(t.position.x),Mathf.Floor(t.position.z));
 	}
+
+	//public void accountForStatus(Vector3 movement,)
 
 	//called on game update to determine orientation change
 	//dim assumes the grid is a sqaure, I think that is safe to say right now

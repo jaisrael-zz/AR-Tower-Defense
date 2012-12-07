@@ -36,6 +36,7 @@
 'Assets/Scripts/levels/victoryManager.cs'
 'Assets/Scripts/manager subscripts/gridCreator.cs'
 'Assets/Scripts/manager subscripts/guiManager.cs'
+'Assets/Scripts/manager subscripts/pathManager.cs'
 'Assets/Scripts/manager subscripts/spawnManager.cs'
 'Assets/Scripts/manager subscripts/touchManager.cs'
 'Assets/Scripts/object scripts/creep.cs'

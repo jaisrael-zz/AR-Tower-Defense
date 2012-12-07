@@ -9,7 +9,7 @@ public class turret : MonoBehaviour {
 	public float rate;				//fire rate
 	public float range;				//fire range
 	public Texture image;			//turret image
-	public int cost;				//turrest cost
+	public int cost;				//turret cost
 
 	//instantiated upon creation (gameManager.cs)
 	//public gameManager gm;			//gets other object and game data

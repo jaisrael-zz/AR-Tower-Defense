@@ -31,11 +31,11 @@ public class gameManager : GameLevel {
 	//creeps
 	public GameObject basicCreep;
 
-	//goal
 	public GameObject goal;
-
-	//spawn point
 	public GameObject spawn;
+	public GameObject pathSystem;
+
+
 
 	/////////////////////////////////////////////////////
 	//Grid Management
@@ -43,6 +43,9 @@ public class gameManager : GameLevel {
 	public gridCreator gc;
 	private GameObject[,] grid;
 	public bool[,] traversible;
+	public float[,] influence;
+	public float totalInfluence;
+	public ArrayList currentPath;
 
 	//public ArrayList turrets;
 	//public ArrayList creeps;
@@ -62,6 +65,9 @@ public class gameManager : GameLevel {
 
 	//Touch Management
 	public touchManager tm;
+
+	//Path Management
+	public pathManager pm;
 
 	/////////////////////////////////////////////////////
 	//Initialization
@@ -89,6 +95,48 @@ public class gameManager : GameLevel {
 		return basicCreep;
 	} 
 
+	void applyToInfluenceMap(GameObject turret,bool add)
+	{
+		Vector2 turretPos = new Vector2(turret.transform.position.x,turret.transform.position.z);
+		turret t = ((turret)turret.GetComponent("turret"));
+		for(int i = (int)(turretPos.x-t.range); i <= (int)(turretPos.x+t.range); i++)
+		{
+			for(int j = (int)(turretPos.y-t.range); j <= (int)(turretPos.y+t.range); j++)
+			{
+				if(i>=0 && j>=0 && i < gc.gridWidth && j < gc.gridHeight)
+				{
+					if(Mathf.Abs(turretPos.x-i)+Mathf.Abs(turretPos.y-j) <= t.range)
+					{
+						if(add) { 	influence[i,j] += 1; totalInfluence += 1; }
+						else { 		influence[i,j] -= 1; totalInfluence -= 1; }
+					}
+				}
+				
+			}
+			
+		}
+		/*for(int y = gc.gridHeight-1; y >= 0; y--)
+		{
+			string debugstr = "";
+			for(int x = 0; x < gc.gridWidth; x++)
+			{
+				debugstr += influence[x,y] + " ";
+			}
+			Debug.Log(debugstr);
+		}*/
+		
+		//Debug.Log(totalInfluence);
+
+	}
+
+	public void destroyTurret(GameObject turret)
+	{
+		traversible[(int)turret.transform.position.x,(int)turret.transform.position.z] = true;
+		availableUnits += ((turret)turret.GetComponent("turret")).cost;
+		applyToInfluenceMap(turret,false);
+		Destroy(turret);
+	}
+
 	//initializers for objects
 	//createss turret, and sets grid tile traversibility to false
 	public void createTurret(Vector2 gridPos, turretType type)
@@ -98,6 +146,11 @@ public class gameManager : GameLevel {
 		newTurret.tag = "Turret";
 		traversible[(int)gridPos.x,(int)gridPos.y] = false;
 		availableUnits -= ((turret)newTurret.GetComponent("turret")).cost;
+		applyToInfluenceMap(newTurret,true);
+		ArrayList proposedPath = pm.updatePath(sm.spawnPos,goalPos);
+		if(proposedPath != null) currentPath = proposedPath;
+		else destroyTurret(newTurret);
+		updatePathParticles();
 		//newTurret.GetComponent("Creep").gm = this.GetComponent("Game Manager");
 		//turrets.Add(newTurret);
 	}
@@ -126,7 +179,6 @@ public class gameManager : GameLevel {
 		newSpawn.tag = "Spawn";
 	}
 
-
 	void Start () {
 
 		state = gameState.buildPhase;
@@ -140,15 +192,24 @@ public class gameManager : GameLevel {
 		//base environment
 		grid = gc.createGameGrid();
 		traversible = new bool[gc.gridWidth,gc.gridHeight];
-		for(int i = 0; i < gc.gridWidth; i++)
-			for(int j = 0; j < gc.gridHeight; j++)
+		influence = new float[gc.gridWidth,gc.gridHeight];
+		for(int i = 0; i < gc.gridWidth; i++) {
+			for(int j = 0; j < gc.gridHeight; j++) {
 				traversible[i,j] = true;
+				influence[i,j] = 0;
+			}
+		}
+		totalInfluence = 0;
 
 		goalPos = new Vector2(gc.gridWidth-1,gc.gridHeight-1);
 
 		createGoal(goalPos);
 		createSpawn(sm.spawnPos);
 
+		currentPath = new ArrayList();
+		currentPath = pm.updatePath(sm.spawnPos,goalPos);
+		if(currentPath == null) Debug.Log("It's null yo");
+		updatePathParticles();
 	}
 	
 	/////////////////////////////////////////////////////
@@ -174,6 +235,25 @@ public class gameManager : GameLevel {
 		state = gameState.battlePhase;
 	}
 	/////////////////////////////////////////////////////
+
+	// this is called every time the path is changed
+	void updatePathParticles () {
+		if(GameObject.FindWithTag("Particle") != null)
+		{
+			foreach(GameObject particle in GameObject.FindGameObjectsWithTag("Particle"))
+			{
+				Destroy(particle);
+			}
+		}
+		if(currentPath != null)
+		{
+			foreach(Vector2 pos in currentPath)
+			{
+				GameObject pathParticle = (GameObject)Instantiate(pathSystem,new Vector3(pos.x,0.0f,pos.y),Quaternion.identity);
+				pathParticle.tag = "Particle";
+			}
+		}
+	}
 
 	// Update is called once per frame
 	void Update () {
