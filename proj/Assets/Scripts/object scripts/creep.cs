@@ -47,8 +47,9 @@ public class creep : MonoBehaviour {
 	public void hit (float damage) 
 	{
 		health -= damage;
+		Debug.Log(health);
 		//Debug.Log(health);
-		if (health < 0)
+		if (health <= 0)
 		{
 			Destroy(this.gameObject);
 		}

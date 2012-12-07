@@ -10,7 +10,11 @@ public enum gameState {
 };
 //possible turrets
 public enum turretType {
-	basic
+	basic,
+	bash,
+	slow,
+	burn,
+	snipe
 }
 //possible creeps
 public enum creepType {
@@ -27,6 +31,10 @@ public class gameManager : GameLevel {
 	
 	//turrets
 	public GameObject basicTurret;
+	public GameObject bashTurret;
+	public GameObject slowTurret;
+	public GameObject burnTurret;
+	public GameObject snipeTurret;
 
 	//creeps
 	public GameObject basicCreep;
@@ -78,6 +86,10 @@ public class gameManager : GameLevel {
 		switch ((int)type)
 		{
 			case 0: return basicTurret;
+			case 1: return bashTurret;
+			case 2: return slowTurret;
+			case 3: return burnTurret;
+			case 4: return snipeTurret;
 
 			default: break;
 		}

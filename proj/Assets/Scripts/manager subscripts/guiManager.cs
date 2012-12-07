@@ -13,10 +13,14 @@ public class guiManager : MonoBehaviour {
 	public Texture pauseButtonTexture;
 	public Texture exitButtonTexture;
 
-	//creep images
-	public Texture basicTurretImage;
-
 	//turret images
+	public Texture basicTurretImage;
+	public Texture bashTurretImage;
+	public Texture slowTurretImage;
+	public Texture burnTurretImage;
+	public Texture snipeTurretImage;
+
+	//creep images
 	public Texture basicCreepImage;
 
 	//GUISkins
@@ -56,10 +60,28 @@ public class guiManager : MonoBehaviour {
 		switch ((int)type)
 		{
 			case 0: return basicTurretImage;
+			case 1: return bashTurretImage;
+			case 2: return slowTurretImage;
+			case 3: return burnTurretImage;
+			case 4: return snipeTurretImage;
 
 			default: break;
 		}
 		return basicTurretImage;
+	}
+	int typeToTurretCost(turretType type)
+	{
+		switch ((int)type)
+		{
+			case 0: return 1;
+			case 1: return 10;
+			case 2: return 3;
+			case 3: return 3;
+			case 4: return 10;
+
+			default: break;
+		}
+		return 1;
 	}
 
 	Texture typeToCreepImage(creepType type)
@@ -142,7 +164,7 @@ public class guiManager : MonoBehaviour {
 			waveViewVector = GUI.BeginScrollView(waveViewRect,waveViewVector,new Rect(0,0,waveViewWidth,waveViewHeight));
 			
 			GUI.Label(new Rect(0,buttonOffset,100,50),("WAVE " + (sm.currentWave+1).ToString() + "\n" + " UP NEXT: "));
-			for(int i = 0; i < 2; i++)
+			for(int i = 0; i <= 2; i++)
 				if(sm.currentWaveIndex+i < sm.allWaves[sm.currentWave].waveSize) 
 					GUI.Label(new Rect(waveContentInitial + (i*waveContentOffset),0,40,40),typeToCreepImage((creepType)sm.allWaves[sm.currentWave].creepIDs[sm.currentWaveIndex]));
 			
@@ -199,13 +221,15 @@ public class guiManager : MonoBehaviour {
 					if(i != 0 || j != 0)
 					{
 						 int typeIndex = (i+1)+((j+1)*3);
+						 if (typeIndex >= 4) typeIndex -= 1; //account for center square
 						 Rect buttonRect = new Rect(tm.selectedPos.x + (selectionOffset*i) - (buttonSize/2) ,Screen.height-tm.selectedPos.y + (selectionOffset*j) - (buttonSize/2),selectionButtonSize,selectionButtonSize);
 						 //need to change
-						 if(typeIndex < System.Enum.GetNames(typeof(turretType)).Length && gm.availableUnits > 0)
+						 if(typeIndex < System.Enum.GetNames(typeof(turretType)).Length && gm.availableUnits >= typeToTurretCost((turretType)typeIndex))
 						 {
 						 	if (GUI.Button(buttonRect,typeToTurretImage((turretType)typeIndex)))
 						 	{
 						 		//set turret
+						 		Debug.Log((turretType)typeIndex);
 						 		gm.createTurret(new Vector2(tm.selectedObject.transform.position.x,tm.selectedObject.transform.position.z),(turretType)typeIndex);
 						 		tm.clickable = true;
 						 		tm.selected = selectedState.none;
