@@ -95,6 +95,17 @@ public class gameManager : GameLevel {
 		return basicCreep;
 	} 
 
+	float typeToInfluence(turretType type)
+	{
+		switch ((int)type)
+		{
+			case 0: return 1;
+
+			default: break;
+		}
+		return 1;
+	}
+
 	void applyToInfluenceMap(GameObject turret,bool add)
 	{
 		Vector2 turretPos = new Vector2(turret.transform.position.x,turret.transform.position.z);
