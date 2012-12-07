@@ -276,7 +276,7 @@ public class gameManager : GameLevel {
 			foreach(GameObject currentCreep in creeps)
 			{
 				creep c = (creep)currentCreep.GetComponent("creep");
-				c.Seek(new Vector2(9,9),traversible,10);
+				c.Seek(new Vector2(9,9),currentPath,10);
 			}
 
 			//update missiles 

@@ -19,6 +19,7 @@ public class creep : MonoBehaviour {
 	public float stunDurationMultiplier;
 	public float slowDurationMultiplier;
 	public float burnDurationMultiplier;
+	int currentIndex;
 
 	
 
@@ -30,7 +31,7 @@ public class creep : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
+		currentIndex = 0;
 	}
 
 	// Update is called once per frame
@@ -60,46 +61,39 @@ public class creep : MonoBehaviour {
 		Destroy(this.gameObject);
 	}
 
-	Vector2 convertToGridPos(Transform t)
+	Vector2 applyStatus(Vector2 raw)
 	{
-		return new Vector2(Mathf.Floor(t.position.x),Mathf.Floor(t.position.z));
+		return raw;
 	}
 
 	//public void accountForStatus(Vector3 movement,)
 
 	//called on game update to determine orientation change
 	//dim assumes the grid is a sqaure, I think that is safe to say right now
-	public void Seek (Vector2 goal, bool[,] traversible, int dim)
+	public void Seek (Vector2 goal, ArrayList path, int dim)
 	{
 		float dt = Time.deltaTime;
-
-		Vector2 pos = convertToGridPos(this.transform);
+		Vector2 pos = new Vector2(this.transform.position.x,this.transform.position.z);
 
 		if(pos.x == goal.x && pos.y == goal.y)
 		{
 			kamikaze();
 		}
 
-		//fail AI: move preference: right, up, left, down
-		//note that creeps can totally get trapped by this even if there is an obvious path
-		//don't switch the order of the boolean statements within each if, will cause
-		//array out of bounds exception
-		if((int)pos.x+1 < dim && traversible[(int)pos.x+1,(int)pos.y])
+		Vector2 currentTarget = (Vector2)path[currentIndex];
+		Vector2 rawMovement = (new Vector2(currentTarget.x-pos.x,currentTarget.y-pos.y));
+		Vector2 direction = rawMovement.normalized;
+		Vector2 movement = applyStatus(direction);
+		movement = new Vector2(movement.x*speed*dt,movement.y*speed*dt);
+
+		if(rawMovement.magnitude <= movement.magnitude)
 		{
-			this.transform.position += new Vector3(speed*dt,0,0);
+			this.transform.position = new Vector3(currentTarget.x,this.transform.position.y,currentTarget.y);
+			
+			currentIndex++;
+			if(currentIndex == path.Count) kamikaze();
 		}
-		else if((int)pos.y+1<dim && traversible[(int)pos.x,(int)pos.y+1])
-		{
-			this.transform.position += new Vector3(0,0,speed*dt);
-		}
-		else if((int)pos.x-1>=0 && traversible[(int)pos.x-1,(int)pos.y])
-		{
-			this.transform.position += new Vector3(-speed*dt,0,0);
-		}
-		else if((int)pos.y-1 >= 0 && traversible[(int)pos.x,(int)pos.y-1])
-		{
-			this.transform.position += new Vector3(0,0,-speed*dt);
-		}
+		this.transform.position += new Vector3(movement.x,0,movement.y);
 
 	}
 }
