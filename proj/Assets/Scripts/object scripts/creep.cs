@@ -3,9 +3,11 @@ using System.Collections;
 
 public enum creepStatus
 {
+	none,
 	stun,
 	slow,
-	burn
+	burn,
+	count
 }
 
 public class creep : MonoBehaviour {
@@ -14,24 +16,26 @@ public class creep : MonoBehaviour {
 	public int speed;
 	public float health;
 	public int weight;
-	public Texture image;
 
-	public float stunDurationMultiplier;
-	public float slowDurationMultiplier;
-	public float burnDurationMultiplier;
 	int currentIndex;
 
-	
+	public int[] currentStatuses;
+	public float[] effectMultipliers;
+	public int[] durationMultipliers;
 
 	//instantiated upon creation
 	public GameObject target;
-	//public gameManager gm;
-
-	private bool[] currentStatuses;
 
 	// Use this for initialization
 	void Start () {
 		currentIndex = 0;
+		currentStatuses = new int[(int)creepStatus.count];
+		durationMultipliers = new int[(int)creepStatus.count];
+		for(int i = 0; i < (int)creepStatus.count; i++)
+		{
+			currentStatuses[i] = 0;
+			durationMultipliers[i] = 1;
+		}
 	}
 
 	// Update is called once per frame
@@ -61,12 +65,46 @@ public class creep : MonoBehaviour {
 		Destroy(this.gameObject);
 	}
 
-	Vector2 applyStatus(Vector2 raw)
+	public void applyStatus(creepStatus status,int frames)
 	{
+
+		if(currentStatuses[(int)status] < frames*durationMultipliers[(int)status])
+		{
+			currentStatuses[(int)status] = frames*durationMultipliers[(int)status];
+		}
+	}
+
+	Vector2 accountForStatus(Vector2 raw)
+	{
+		for(int i = 0; i < currentStatuses.Length; i++)
+		{
+			if(currentStatuses[i] > 0)
+			{
+				switch(i)
+				{
+					case (int)creepStatus.stun: 
+						raw = new Vector2(0,0);
+						break;
+					case (int)creepStatus.slow:
+						raw = new Vector2(raw.x*0.5f*effectMultipliers[i],raw.y*0.5f*effectMultipliers[i]);
+						break;
+					case (int)creepStatus.burn:
+						hit(0.01f*effectMultipliers[i]);
+						break;
+					default:
+						break;
+				}
+			}
+		}
 		return raw;
 	}
 
-	//public void accountForStatus(Vector3 movement,)
+	public void updateStatuses()
+	{
+		for(int i = 0; i < currentStatuses.Length; i++)
+			if(currentStatuses[i] > 0)
+				currentStatuses[i]--;
+	}
 
 	//called on game update to determine orientation change
 	//dim assumes the grid is a sqaure, I think that is safe to say right now
@@ -83,7 +121,7 @@ public class creep : MonoBehaviour {
 		Vector2 currentTarget = (Vector2)path[currentIndex];
 		Vector2 rawMovement = (new Vector2(currentTarget.x-pos.x,currentTarget.y-pos.y));
 		Vector2 direction = rawMovement.normalized;
-		Vector2 movement = applyStatus(direction);
+		Vector2 movement = accountForStatus(direction);
 		movement = new Vector2(movement.x*speed*dt,movement.y*speed*dt);
 
 		if(rawMovement.magnitude <= movement.magnitude)

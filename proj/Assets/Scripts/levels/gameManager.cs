@@ -277,6 +277,7 @@ public class gameManager : GameLevel {
 			{
 				creep c = (creep)currentCreep.GetComponent("creep");
 				c.Seek(new Vector2(9,9),currentPath,10);
+				c.updateStatuses();
 			}
 
 			//update missiles 
@@ -297,26 +298,12 @@ public class gameManager : GameLevel {
 				}
 			}
 		}
-		else if((int)state == (int)gameState.buildPhase)
+		if(tm.selected == selectedState.creep)
 		{
-			//Debug.Log("Let's Build Yo");
-			if(tm.selected == selectedState.turret)
-			{
-
-			}
-			else if(tm.selected == selectedState.tile)
-			{
-
-			}
-			else if(tm.selected == selectedState.creep)
-			{
-				//apply stun 
-			}
-
-		}
-		else if((int)state == (int)gameState.gameOver)
-		{
-			//Debug.Log("YOU LOSE");
+			//apply stun 
+			creep c = (creep)tm.selectedObject.GetComponent("creep");
+			c.applyStatus(creepStatus.stun,10/**c.durationMultiplier[1]*/);
+			tm.selected = selectedState.none;
 		}
 	}
 
