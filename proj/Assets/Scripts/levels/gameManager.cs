@@ -111,7 +111,7 @@ public class gameManager : GameLevel {
 	{
 		switch ((int)type)
 		{
-			case 0: return 1;
+			case 0: return 1; 
 
 			default: break;
 		}
@@ -130,8 +130,9 @@ public class gameManager : GameLevel {
 				{
 					if(Mathf.Abs(turretPos.x-i)+Mathf.Abs(turretPos.y-j) <= t.range)
 					{
-						if(add) { 	influence[i,j] += 1; totalInfluence += 1; }
-						else { 		influence[i,j] -= 1; totalInfluence -= 1; }
+						float inf = typeToInfluence((turretType)t.identifier);
+						if(add) { 	influence[i,j] += inf; totalInfluence += inf; }
+						else { 		influence[i,j] -= inf; totalInfluence -= inf; }
 					}
 				}
 				
