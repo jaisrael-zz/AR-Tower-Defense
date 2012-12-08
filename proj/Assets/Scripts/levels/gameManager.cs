@@ -330,16 +330,14 @@ public class gameManager : GameLevel {
 					else win();
 				}
 			}
-		}
-		if(tm.selected == selectedState.creep && tm.selectedObject != null)
-		{
-			//apply stun 
-			creep c = (creep)tm.selectedObject.GetComponent("creep");
-			c.applyStatus(creepStatus.stun,3*c.durationMultipliers[1]);
+			if(tm.selected == selectedState.creep && tm.selectedObject != null)
+			{
+				//apply stun 
+				creep c = (creep)tm.selectedObject.GetComponent("creep");
+				c.applyStatus(creepStatus.stun,3*c.durationMultipliers[1]);
+				//tm.selected = selectedState.none;
+			}
 			tm.selected = selectedState.none;
 		}
-
 	}
-
-
 }
