@@ -338,6 +338,7 @@ public class gameManager : GameLevel {
 				//tm.selected = selectedState.none;
 			}
 			tm.selected = selectedState.none;
+			tm.clickable = true;
 		}
 	}
 }

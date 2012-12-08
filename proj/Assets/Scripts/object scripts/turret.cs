@@ -122,7 +122,7 @@ public class turret : MonoBehaviour {
 				bool hasStatus = false;
 				for(int i = 1; i < c.currentStatuses.Length; i++)
 				{
-					if(c[i] > 0)
+					if(c.currentStatuses[i] > 0)
 					{
 						hasStatus = true;
 						break;
@@ -133,7 +133,7 @@ public class turret : MonoBehaviour {
 				{
 					target = creep;
 					minDist = targetDist;
-					minStatus == hasStatus;
+					minStatus = hasStatus;
 				}
 			}
 		}
