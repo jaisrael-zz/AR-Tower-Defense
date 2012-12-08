@@ -31,7 +31,7 @@ public class missile : MonoBehaviour {
 				if (dFromCenter < radius)
 				{
 					//splash removed
-					float splashDamage = ((radius - dFromCenter)/radius)*damage;
+					//float splashDamage = ((radius - dFromCenter)/radius)*damage;
 					creep c = (creep)creep.GetComponent("creep");
 					c.hit(damage);
 					c.applyStatus((creepStatus)statusEffect,potency);
