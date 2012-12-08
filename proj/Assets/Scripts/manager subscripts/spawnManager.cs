@@ -54,19 +54,67 @@ public class spawnManager : MonoBehaviour {
 		return false;
 	}
 
-	// Use this for initialization
-	// Current wave generation is temporary
+	//starts of close to 2 sec/creep, tends toward .5 sec/creep
+	float waveSpawnFunction(float waveIndex)
+	{
+		return (1/((waveIndex+5.0f)/8.0f))+0.5f;
+	}
+
+	//increases wave length by 2 each wave
+	int waveLengthFunction(int waveIndex)
+	{
+		return 1+(waveIndex*2);
+	}
+
+	//returns a creep id randomly based off of a probability function
+	//for each group of waves
+	int idSpawnFunction(float waveIndex)
+	{
+		float rand = UnityEngine.Random.value;
+		if(waveIndex < 5) {
+			return (int)creepType.basic;
+		} else if(waveIndex < 10) {
+			if 		(rand < .33f)	return (int)creepType.basic;
+			else if (rand < .67f) 	return (int)creepType.quick;
+			else 					return (int)creepType.strong;
+		} else if(waveIndex < 15) {
+			if 		(rand < .20f)	return (int)creepType.basic;
+			else if (rand < .40f) 	return (int)creepType.quick;
+			else if (rand < .60f) 	return (int)creepType.quickStatus;
+			else if (rand < .80f) 	return (int)creepType.strong;
+			else 					return (int)creepType.strongStatus;
+		} else if(waveIndex < 20) {
+			if 		(rand < .10f)	return (int)creepType.basic;
+			else if (rand < .40f)	return (int)creepType.quick;
+			else if (rand < .60f) 	return (int)creepType.quickStatus;
+			else if (rand < .75f)	return (int)creepType.strong;
+			else 					return (int)creepType.strongStatus;	
+		} else {
+			if 		(rand < .02f)	return (int)creepType.basic;
+			else if (rand < .30f)	return (int)creepType.quick;
+			else if (rand < .60f) 	return (int)creepType.quickStatus;
+			else if (rand < .75f)	return (int)creepType.strong;
+			else 					return (int)creepType.strongStatus;
+		}
+	}
+
 	void Start () {
 		
 		allWaves = new wave[totalWaves];
 
-		allWaves[0].waveSize = 1;
-		allWaves[0].creepIDs = new int[] {4};
-		allWaves[0].spawnTimes = new float[] {0};
-
-		allWaves[1].waveSize = 5;
-		allWaves[1].creepIDs = new int[] {0,0,0,0,0};
-		allWaves[1].spawnTimes = new float[] {0,2,4,6,8};
+		for(int i = 0; i < totalWaves; i++)
+		{
+			//UnityEngine.Random.seed = (int)Time.time;
+			allWaves[i].waveSize = waveLengthFunction(i);
+			allWaves[i].creepIDs = new int[allWaves[i].waveSize];
+			allWaves[i].spawnTimes = new float[allWaves[i].waveSize];
+			float offset = waveSpawnFunction((float)i);
+			for(int j = 0; j < allWaves[i].waveSize; j++)
+			{
+				allWaves[i].creepIDs[j] = idSpawnFunction((float)i);
+				allWaves[i].spawnTimes[j] = ((float)j)*offset;
+			}
+		}
 
 		currentWave = 0;
 		currentWaveIndex = 0;

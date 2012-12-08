@@ -15,6 +15,6 @@ public class texturing : MonoBehaviour {
 	void Update () {
 		float dt = Time.deltaTime;
 		Vector2 currentOffset = this.renderer.material.GetTextureOffset("_MainTex");
-		this.renderer.material.SetTextureOffset("_MainTex",currentOffset+(new Vector2(xOffset,yOffset)*dt));
+		this.gameObject.renderer.material.SetTextureOffset("_MainTex",currentOffset+(new Vector2(xOffset,yOffset)*dt));
 	}
 }

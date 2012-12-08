@@ -171,7 +171,7 @@ public class guiManager : MonoBehaviour {
 			GUI.Label(new Rect(0,buttonOffset,100,50),("WAVE " + (sm.currentWave+1).ToString() + "\n" + " UP NEXT: "));
 			for(int i = 0; i <= 2; i++)
 				if(sm.currentWaveIndex+i < sm.allWaves[sm.currentWave].waveSize) 
-					GUI.Label(new Rect(waveContentInitial + (i*waveContentOffset),0,40,40),typeToCreepImage((creepType)sm.allWaves[sm.currentWave].creepIDs[sm.currentWaveIndex]));
+					GUI.Label(new Rect(waveContentInitial + (i*waveContentOffset),0,40,40),typeToCreepImage((creepType)sm.allWaves[sm.currentWave].creepIDs[sm.currentWaveIndex+i]));
 			
 			GUI.EndScrollView();
 		}
@@ -245,7 +245,10 @@ public class guiManager : MonoBehaviour {
 				}
 			}
 		}
-		if(tm.selected == selectedState.turret) tm.clickable = true;
+		if(tm.selected == selectedState.turret) {
+			tm.clickable = true;
+			tm.selected = selectedState.none;
+		}
 	}
 
 	void exitWindow(int windowID)

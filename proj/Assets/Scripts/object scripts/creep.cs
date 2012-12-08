@@ -17,6 +17,7 @@ public class creep : MonoBehaviour {
 	public float health;
 	public int weight;
 	public int identifier;
+	public int gold;
 
 	int currentIndex;
 
@@ -48,10 +49,10 @@ public class creep : MonoBehaviour {
 	public void hit (float damage) 
 	{
 		health -= damage;
-		Debug.Log(health);
-		//Debug.Log(health);
 		if (health <= 0)
 		{
+			gameManager gm = (gameManager)Camera.allCameras[0].GetComponent("gameManager");
+			gm.updateAvailableUnits(gold);
 			Destroy(this.gameObject);
 		}
 	}
