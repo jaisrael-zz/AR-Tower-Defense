@@ -166,7 +166,7 @@ public class gameManager : GameLevel {
 	public void createTurret(Vector2 gridPos, turretType type)
 	{
 		GameObject newTurretType = typeToTurret(type);
-		GameObject newTurret = (GameObject)Instantiate(newTurretType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
+		GameObject newTurret = (GameObject)Instantiate(newTurretType,new Vector3(gridPos.x,0.6f,gridPos.y),Quaternion.identity);
 		newTurret.tag = "Turret";
 		traversible[(int)gridPos.x,(int)gridPos.y] = false;
 		availableUnits -= ((turret)newTurret.GetComponent("turret")).cost;

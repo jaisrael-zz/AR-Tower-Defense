@@ -44,7 +44,9 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\animation scripts\flipping.cs" />
      <Compile Include="Assets\Scripts\animation scripts\floating.cs" />
+     <Compile Include="Assets\Scripts\animation scripts\texturing.cs" />
      <Compile Include="Assets\Scripts\gameLevel.cs" />
      <Compile Include="Assets\Scripts\levels\gameManager.cs" />
      <Compile Include="Assets\Scripts\levels\gameOverManager.cs" />
