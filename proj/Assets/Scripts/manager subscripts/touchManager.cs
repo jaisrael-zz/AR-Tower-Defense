@@ -37,15 +37,15 @@ public class touchManager : MonoBehaviour {
 					//of an overall object (ie the ray hits turretBody, part of a Turret gameObject)
 					if(selected == selectedState.none) selectedObject = hitInfo.collider.gameObject.transform.parent.gameObject;
 
-					if(selectedObject.tag == "Tile" && selected == selectedState.none) {
+					if(selectedObject.tag == "Tile") {
 						selected = selectedState.tile;
 						clickable = false;
 					}
-					if(selectedObject.tag == "Turret" && selected == selectedState.none) {
+					if(selectedObject.tag == "Turret") {
 						selected = selectedState.turret;
 						//clickable = false;
 					}
-					if(selectedObject.tag == "Creep" && selected == selectedState.none) selected = selectedState.creep;
+					if(selectedObject.tag == "Creep") selected = selectedState.creep;
 				}
 				else 
 				{
@@ -54,6 +54,5 @@ public class touchManager : MonoBehaviour {
 				
 			}
 		}
-		//Debug.Log(selected);
 	}
 }

@@ -45,9 +45,9 @@ public class spawnManager : MonoBehaviour {
 		
 		allWaves = new wave[totalWaves];
 
-		allWaves[0].waveSize = 3;
-		allWaves[0].creepIDs = new int[] {0,0,0};
-		allWaves[0].spawnTimes = new float[] {0,2,4};
+		allWaves[0].waveSize = 1;
+		allWaves[0].creepIDs = new int[] {0};
+		allWaves[0].spawnTimes = new float[] {0};
 
 		allWaves[1].waveSize = 5;
 		allWaves[1].creepIDs = new int[] {0,0,0,0,0};
