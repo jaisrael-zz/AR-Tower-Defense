@@ -22,6 +22,10 @@ public class guiManager : MonoBehaviour {
 
 	//creep images
 	public Texture basicCreepImage;
+	public Texture quickCreepImage;
+	public Texture quickStatusCreepImage;
+	public Texture strongCreepImage;
+	public Texture strongStatusCreepImage;
 
 	//GUISkins
 	public GUISkin buttonSkin;
@@ -64,7 +68,6 @@ public class guiManager : MonoBehaviour {
 			case 2: return slowTurretImage;
 			case 3: return burnTurretImage;
 			case 4: return snipeTurretImage;
-
 			default: break;
 		}
 		return basicTurretImage;
@@ -78,7 +81,6 @@ public class guiManager : MonoBehaviour {
 			case 2: return 3;
 			case 3: return 3;
 			case 4: return 10;
-
 			default: break;
 		}
 		return 1;
@@ -89,7 +91,10 @@ public class guiManager : MonoBehaviour {
 		switch ((int)type)
 		{
 			case 0: return basicCreepImage;
-
+			case 1: return quickCreepImage;
+			case 2: return quickStatusCreepImage;
+			case 3: return strongCreepImage;
+			case 4: return strongStatusCreepImage;
 			default: break;
 		}
 		return basicCreepImage;

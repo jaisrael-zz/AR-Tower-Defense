@@ -13,9 +13,10 @@ public enum creepStatus
 public class creep : MonoBehaviour {
 
 	//instantiated in prefab
-	public int speed;
+	public float speed;
 	public float health;
 	public int weight;
+	public int identifier;
 
 	int currentIndex;
 

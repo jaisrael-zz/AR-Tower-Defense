@@ -22,6 +22,21 @@ public class spawnManager : MonoBehaviour {
 
 	public wave[] allWaves;
 
+	//somewhat arbitrary; will be balanced if needed
+	public int creepToInfluenct(int type)
+	{
+		//loosely: creep health*creep speeds
+		switch(type)
+		{
+			case 0: return 5;
+			case 1: return 9;
+			case 2: return 20;
+			case 3: return 8;
+			case 4: return 15;
+			default: break;
+		}
+		return 1;
+	}
 
 	public bool isWaveDefeated()
 	{
@@ -46,7 +61,7 @@ public class spawnManager : MonoBehaviour {
 		allWaves = new wave[totalWaves];
 
 		allWaves[0].waveSize = 1;
-		allWaves[0].creepIDs = new int[] {0};
+		allWaves[0].creepIDs = new int[] {4};
 		allWaves[0].spawnTimes = new float[] {0};
 
 		allWaves[1].waveSize = 5;

@@ -18,7 +18,11 @@ public enum turretType {
 }
 //possible creeps
 public enum creepType {
-	basic
+	basic,
+	quick,
+	quickStatus,
+	strong,
+	strongStatus
 }
 
 
@@ -38,10 +42,15 @@ public class gameManager : GameLevel {
 
 	//creeps
 	public GameObject basicCreep;
+	public GameObject quickCreep;
+	public GameObject quickStatusCreep;
+	public GameObject strongCreep;
+	public GameObject strongStatusCreep;
 
+	//other objects
 	public GameObject goal;
 	public GameObject spawn;
-	public GameObject pathSystem;
+	public GameObject pathSystem; //highlighted creep path
 
 
 
@@ -50,19 +59,17 @@ public class gameManager : GameLevel {
 	//makes game grid
 	public gridCreator gc;
 	private GameObject[,] grid;
-	public bool[,] traversible;
-	public float[,] influence;
-	public float totalInfluence;
-	public ArrayList currentPath;
 
-	//public ArrayList turrets;
-	//public ArrayList creeps;
+	public bool[,] traversible;		//map of occupied spaces
+	public float[,] influence; 		//influence map
+	public float totalInfluence;	//used for heuristic
+	public ArrayList currentPath;	
 
 	public Vector2 goalPos;
 
-	public GameObject selectedTile;
+	public GameObject selectedTile;	
 
-	public int availableUnits;
+	public int availableUnits;		//purchasing power
 
 	/////////////////////////////////////////////////////
 	//Spawn Management
@@ -80,7 +87,7 @@ public class gameManager : GameLevel {
 	/////////////////////////////////////////////////////
 	//Initialization
 
-	// enum to GameObject converters
+	// enum converters
 	GameObject typeToTurret(turretType type)
 	{
 		switch ((int)type)
@@ -101,6 +108,10 @@ public class gameManager : GameLevel {
 		switch ((int)type)
 		{
 			case 0: return basicCreep;
+			case 1: return quickCreep;
+			case 2: return quickStatusCreep;
+			case 3: return strongCreep;
+			case 4: return strongStatusCreep;
 
 			default: break;
 		}
@@ -112,12 +123,17 @@ public class gameManager : GameLevel {
 		switch ((int)type)
 		{
 			case 0: return 1; 
+			case 1: return 10;
+			case 2: return 3;
+			case 3: return 3;
+			case 4: return 10;
 
 			default: break;
 		}
 		return 1;
 	}
 
+	//updates influence map when turret is added/removed
 	void applyToInfluenceMap(GameObject turret,bool add)
 	{
 		Vector2 turretPos = new Vector2(turret.transform.position.x,turret.transform.position.z);
@@ -134,25 +150,12 @@ public class gameManager : GameLevel {
 						if(add) { 	influence[i,j] += inf; totalInfluence += inf; }
 						else { 		influence[i,j] -= inf; totalInfluence -= inf; }
 					}
-				}
-				
-			}
-			
+				}	
+			}			
 		}
-		/*for(int y = gc.gridHeight-1; y >= 0; y--)
-		{
-			string debugstr = "";
-			for(int x = 0; x < gc.gridWidth; x++)
-			{
-				debugstr += influence[x,y] + " ";
-			}
-			Debug.Log(debugstr);
-		}*/
-		
-		//Debug.Log(totalInfluence);
-
 	}
 
+	//destroys turret, sets grid traversability to true, updates influence map
 	public void destroyTurret(GameObject turret)
 	{
 		traversible[(int)turret.transform.position.x,(int)turret.transform.position.z] = true;
@@ -162,7 +165,7 @@ public class gameManager : GameLevel {
 	}
 
 	//initializers for objects
-	//createss turret, and sets grid tile traversibility to false
+	//createss turret, and sets grid tile traversibility to false, updates influence map
 	public void createTurret(Vector2 gridPos, turretType type)
 	{
 		GameObject newTurretType = typeToTurret(type);
