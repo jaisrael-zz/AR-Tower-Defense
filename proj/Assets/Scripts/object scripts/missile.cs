@@ -8,6 +8,8 @@ public class missile : MonoBehaviour {
 	public float damage; //damage at center
 	public float radius; //damage radius
 	public float att;	 //damage attenuation across area of effect
+	public int statusEffect;
+	public int potency;
 
 	//instantiated upon creation
 	public Transform target;
@@ -28,9 +30,11 @@ public class missile : MonoBehaviour {
 				//Debug.Log(dFromCenter);
 				if (dFromCenter < radius)
 				{
-					float splashDamage = ((radius - dFromCenter)/radius)*damage;
+					//splash removed
+					//float splashDamage = ((radius - dFromCenter)/radius)*damage;
 					creep c = (creep)creep.GetComponent("creep");
-					c.hit(splashDamage);
+					c.hit(damage);
+					c.applyStatus((creepStatus)statusEffect,potency);
 				}
 			}
 		}

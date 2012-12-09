@@ -13,9 +13,11 @@ public enum creepStatus
 public class creep : MonoBehaviour {
 
 	//instantiated in prefab
-	public int speed;
+	public float speed;
 	public float health;
 	public int weight;
+	public int identifier;
+	public int gold;
 
 	int currentIndex;
 
@@ -47,9 +49,12 @@ public class creep : MonoBehaviour {
 	public void hit (float damage) 
 	{
 		health -= damage;
-		//Debug.Log(health);
-		if (health < 0)
+		if (health <= 0)
 		{
+			gameManager gm = (gameManager)Camera.allCameras[0].GetComponent("gameManager");
+			gm.updateAvailableUnits(gold);
+			GameObject explosion = (GameObject)Instantiate(Resources.Load("creepDeath"),this.transform.position,Quaternion.identity);
+			Destroy(explosion,1);
 			Destroy(this.gameObject);
 		}
 	}
@@ -62,6 +67,8 @@ public class creep : MonoBehaviour {
 			goal gscript = (goal)g.GetComponent("goal");
 			gscript.Hit(weight);
 		}
+		GameObject explosion = (GameObject)Instantiate(Resources.Load("creepDeath"),this.transform.position,Quaternion.identity);
+		Destroy(explosion,1);
 		Destroy(this.gameObject);
 	}
 

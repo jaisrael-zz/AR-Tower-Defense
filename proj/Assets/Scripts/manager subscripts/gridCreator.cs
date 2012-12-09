@@ -42,6 +42,7 @@ public class gridCreator : MonoBehaviour {
 		}
 */
 		GameObject light = (GameObject)Instantiate(GlobalLight);
+		light.transform.position = light.transform.position;
 
 		return grid;
 	}

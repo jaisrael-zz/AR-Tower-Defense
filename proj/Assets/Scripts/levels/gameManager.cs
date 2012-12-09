@@ -10,11 +10,19 @@ public enum gameState {
 };
 //possible turrets
 public enum turretType {
-	basic
+	basic,
+	bash,
+	slow,
+	burn,
+	snipe
 }
 //possible creeps
 public enum creepType {
-	basic
+	basic,
+	quick,
+	quickStatus,
+	strong,
+	strongStatus
 }
 
 
@@ -27,13 +35,22 @@ public class gameManager : GameLevel {
 	
 	//turrets
 	public GameObject basicTurret;
+	public GameObject bashTurret;
+	public GameObject slowTurret;
+	public GameObject burnTurret;
+	public GameObject snipeTurret;
 
 	//creeps
 	public GameObject basicCreep;
+	public GameObject quickCreep;
+	public GameObject quickStatusCreep;
+	public GameObject strongCreep;
+	public GameObject strongStatusCreep;
 
+	//other objects
 	public GameObject goal;
 	public GameObject spawn;
-	public GameObject pathSystem;
+	public GameObject pathSystem; //highlighted creep path
 
 
 
@@ -42,19 +59,17 @@ public class gameManager : GameLevel {
 	//makes game grid
 	public gridCreator gc;
 	private GameObject[,] grid;
-	public bool[,] traversible;
-	public float[,] influence;
-	public float totalInfluence;
-	public ArrayList currentPath;
 
-	//public ArrayList turrets;
-	//public ArrayList creeps;
+	public bool[,] traversible;		//map of occupied spaces
+	public float[,] influence; 		//influence map
+	public float totalInfluence;	//used for heuristic
+	public ArrayList currentPath;	
 
 	public Vector2 goalPos;
 
-	public GameObject selectedTile;
+	public GameObject selectedTile;	
 
-	public int availableUnits;
+	public int availableUnits;		//purchasing power
 
 	/////////////////////////////////////////////////////
 	//Spawn Management
@@ -72,12 +87,16 @@ public class gameManager : GameLevel {
 	/////////////////////////////////////////////////////
 	//Initialization
 
-	// enum to GameObject converters
+	// enum converters
 	GameObject typeToTurret(turretType type)
 	{
 		switch ((int)type)
 		{
 			case 0: return basicTurret;
+			case 1: return bashTurret;
+			case 2: return slowTurret;
+			case 3: return burnTurret;
+			case 4: return snipeTurret;
 
 			default: break;
 		}
@@ -89,6 +108,10 @@ public class gameManager : GameLevel {
 		switch ((int)type)
 		{
 			case 0: return basicCreep;
+			case 1: return quickCreep;
+			case 2: return quickStatusCreep;
+			case 3: return strongCreep;
+			case 4: return strongStatusCreep;
 
 			default: break;
 		}
@@ -99,13 +122,18 @@ public class gameManager : GameLevel {
 	{
 		switch ((int)type)
 		{
-			case 0: return 1;
+			case 0: return 1; 
+			case 1: return 10;
+			case 2: return 3;
+			case 3: return 3;
+			case 4: return 10;
 
 			default: break;
 		}
 		return 1;
 	}
 
+	//updates influence map when turret is added/removed
 	void applyToInfluenceMap(GameObject turret,bool add)
 	{
 		Vector2 turretPos = new Vector2(turret.transform.position.x,turret.transform.position.z);
@@ -118,28 +146,16 @@ public class gameManager : GameLevel {
 				{
 					if(Mathf.Abs(turretPos.x-i)+Mathf.Abs(turretPos.y-j) <= t.range)
 					{
-						if(add) { 	influence[i,j] += 1; totalInfluence += 1; }
-						else { 		influence[i,j] -= 1; totalInfluence -= 1; }
+						float inf = typeToInfluence((turretType)t.identifier);
+						if(add) { 	influence[i,j] += inf; totalInfluence += inf; }
+						else { 		influence[i,j] -= inf; totalInfluence -= inf; }
 					}
-				}
-				
-			}
-			
+				}	
+			}			
 		}
-		/*for(int y = gc.gridHeight-1; y >= 0; y--)
-		{
-			string debugstr = "";
-			for(int x = 0; x < gc.gridWidth; x++)
-			{
-				debugstr += influence[x,y] + " ";
-			}
-			Debug.Log(debugstr);
-		}*/
-		
-		//Debug.Log(totalInfluence);
-
 	}
 
+	//destroys turret, sets grid traversability to true, updates influence map
 	public void destroyTurret(GameObject turret)
 	{
 		traversible[(int)turret.transform.position.x,(int)turret.transform.position.z] = true;
@@ -149,7 +165,7 @@ public class gameManager : GameLevel {
 	}
 
 	//initializers for objects
-	//createss turret, and sets grid tile traversibility to false
+	//createss turret, and sets grid tile traversibility to false, updates influence map
 	public void createTurret(Vector2 gridPos, turretType type)
 	{
 		GameObject newTurretType = typeToTurret(type);
@@ -170,7 +186,7 @@ public class gameManager : GameLevel {
 	public void createCreep(Vector2 gridPos, creepType type)
 	{
 		GameObject newCreepType = typeToCreep(type);
-		GameObject newCreep = (GameObject)Instantiate(newCreepType,new Vector3(gridPos.x,0.4f,gridPos.y),Quaternion.identity);
+		GameObject newCreep = (GameObject)Instantiate(newCreepType,new Vector3(gridPos.x,0.6f,gridPos.y),Quaternion.identity);
 		//newCreep.GetComponent("Turret").gm = this.GetComponent("Game Manager");
 		newCreep.tag = "Creep";
 		//creeps.Add(newCreep);
@@ -247,6 +263,11 @@ public class gameManager : GameLevel {
 	}
 	/////////////////////////////////////////////////////
 
+	public void updateAvailableUnits(int gold)
+	{
+		availableUnits += gold;
+	}
+
 	// this is called every time the path is changed
 	void updatePathParticles () {
 		if(GameObject.FindWithTag("Particle") != null)
@@ -304,19 +325,20 @@ public class gameManager : GameLevel {
 				Debug.Log("here");
 				if(sm.isWaveDefeated())
 				{
+					updateAvailableUnits(sm.currentWave);
 					if(sm.currentWave == sm.totalWaves) totalWin();
 					else win();
 				}
 			}
-		}
-		if(tm.selected == selectedState.creep)
-		{
-			//apply stun 
-			creep c = (creep)tm.selectedObject.GetComponent("creep");
-			c.applyStatus(creepStatus.stun,10/**c.durationMultiplier[1]*/);
+			if(tm.selected == selectedState.creep && tm.selectedObject != null)
+			{
+				//apply stun 
+				creep c = (creep)tm.selectedObject.GetComponent("creep");
+				c.applyStatus(creepStatus.stun,3*c.durationMultipliers[1]);
+				//tm.selected = selectedState.none;
+			}
 			tm.selected = selectedState.none;
+			tm.clickable = true;
 		}
 	}
-
-
 }
