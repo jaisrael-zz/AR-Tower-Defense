@@ -17,8 +17,11 @@ using namespace cv;
 using namespace std;
 
 int clicks;
+int texture_created;
 Mat image;
 vector<Point2f> im0_corners(4); 
+GLuint backgroundTextureID;
+
 
 //click 4 points of the plane callback
 static void onMouse(int event, int x, int y, int, void*)
@@ -138,12 +141,87 @@ Mat find_next_homography(Mat im, Mat image_next, vector<KeyPoint> keypoints_0, M
 
 }
 
-void updateSFML(float elapsedTime)
+void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat H, double s)
 {
+	int w = image.cols;
+	int h = image.rows;
+	//Initialize texture
+	if(!texture_created)
+	{
+		glGenTextures(1, &backgroundTextureID);
+		glBindTexture(GL_TEXTURE_2D, backgroundTextureID);
+
+  		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		texture_created = 1;
+	}
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	//draw background image (webcam frame)
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, backgroundImage.data);
 
-    glMatrixMode(GL_MODELVIEW);
+ 
+    const GLfloat bgTextureVertices[] = { 0, 0, w, 0, 0, h, w, h };
+	const GLfloat bgTextureCoords[]   = { 1, 0, 1, 1, 0, 0, 0, 1 };
+  	const GLfloat proj_bg[]              = { 0, -2.f/w, 0, 0, -2.f/h, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1 };
+
+  	glMatrixMode(GL_PROJECTION);
+  	glLoadMatrixf(proj_bg);
+
+  	glMatrixMode(GL_MODELVIEW);
+ 	glLoadIdentity();
+
+  	glEnable(GL_TEXTURE_2D);
+  	glBindTexture(GL_TEXTURE_2D, backgroundTextureID);
+
+  	// Update attribute values.
+  	glEnableClientState(GL_VERTEX_ARRAY);
+  	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+  	glVertexPointer(2, GL_FLOAT, 0, bgTextureVertices);
+  	glTexCoordPointer(2, GL_FLOAT, 0, bgTextureCoords);
+
+  	glColor4f(1,1,1,1);
+  	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+  	glDisableClientState(GL_VERTEX_ARRAY);
+  	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  	glDisable(GL_TEXTURE_2D);
+
+
+
+	//draw the cube according to the camera matrix 
+	float len;
+	if (s < 1)	len = s;
+	if (1 >= s) len = 1;
+	
+	float near = 0.1;
+	float far = 100.f;
+
+	//build projection matrix from K
+	float f_x = K.data[0];
+	float f_y = K.data[4];
+	//float f_z = K.data[4];  //maybe its f_z?
+	float c_x = K.data[2];
+	float c_y = K.data[5]; 
+	//float c_z = K.data[5]; i
+
+	//remember this is in column major order!!!!
+	//so its actually the transpose of what it looks like!
+  	const GLfloat proj_camera[] = { -2.f*f_x / w, 0, 0, 0, 
+								    0, -2.f*f_y/ h, 0, 0, 
+								  2.f*c_x / w - 1, 2.f*c_y / h - 1, -(far+near)/ (far - near), -1.f, 
+								  0, 0, -2.f*far*near / (far - near), 1 };
+	
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+  	//glLoadMatrixf(proj_bg);
+    //fov, aspect ratio, nearclip, farclip
+    gluPerspective(90.f, 1.f, 1.f, 500.f);
+    
+	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.f, 0.f, -200.f);
     glRotatef(elapsedTime*50, 1.f, 0.f, 0.f);
@@ -162,33 +240,35 @@ void updateSFML(float elapsedTime)
     glVertex3f( 50.f,  50.f, 50.f);
     glVertex3f( 50.f, -50.f, 50.f);
 
-            glVertex3f(-50.f, -50.f, -50.f);
-            glVertex3f(-50.f,  50.f, -50.f);
-            glVertex3f(-50.f,  50.f,  50.f);
-            glVertex3f(-50.f, -50.f,  50.f);
+    glVertex3f(-50.f, -50.f, -50.f);
+    glVertex3f(-50.f,  50.f, -50.f);
+    glVertex3f(-50.f,  50.f,  50.f);
+    glVertex3f(-50.f, -50.f,  50.f);
 
-            glVertex3f(50.f, -50.f, -50.f);
-            glVertex3f(50.f,  50.f, -50.f);
-            glVertex3f(50.f,  50.f,  50.f);
-            glVertex3f(50.f, -50.f,  50.f);
+    glVertex3f(50.f, -50.f, -50.f);
+    glVertex3f(50.f,  50.f, -50.f);
+    glVertex3f(50.f,  50.f,  50.f);
+    glVertex3f(50.f, -50.f,  50.f);
 
-            glVertex3f(-50.f, -50.f,  50.f);
-            glVertex3f(-50.f, -50.f, -50.f);
-            glVertex3f( 50.f, -50.f, -50.f);
-            glVertex3f( 50.f, -50.f,  50.f);
+    glVertex3f(-50.f, -50.f,  50.f);
+    glVertex3f(-50.f, -50.f, -50.f);
+    glVertex3f( 50.f, -50.f, -50.f);
+    glVertex3f( 50.f, -50.f,  50.f);
 
-            glVertex3f(-50.f, 50.f,  50.f);
-            glVertex3f(-50.f, 50.f, -50.f);
-            glVertex3f( 50.f, 50.f, -50.f);
-            glVertex3f( 50.f, 50.f,  50.f);
+    glVertex3f(-50.f, 50.f,  50.f);
+    glVertex3f(-50.f, 50.f, -50.f);
+    glVertex3f( 50.f, 50.f, -50.f);
+    glVertex3f( 50.f, 50.f,  50.f);
 
-        glEnd();
+    glEnd();
+
+	
 
 }
 
 int main(int argc, char* argv[])
 {
-	
+	texture_created = 0;	
 	/* Enable smooth shading */
     glShadeModel( GL_SMOOTH );
 
@@ -230,10 +310,6 @@ int main(int argc, char* argv[])
 	sf::Clock Clock;
 	sf::Window App(sf::VideoMode(image.cols, image.rows, 32), "SFML window");
 	
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    //fov, aspect ratio, nearclip, farclip
-    gluPerspective(90.f, 1.f, 1.f, 500.f);
 
 	//imshow("Click Points", image);
 	cout << "Camera Calibration" << endl;
@@ -365,7 +441,8 @@ int main(int argc, char* argv[])
 	scale.at<double>(1,1) = 1 / s;
 
 	cout << "detect features points" << endl;
-	H_wi = H*scale;
+	//H_wi = H*scale;
+	H_wi = KM*scale;
 
 	//test H_w0
     Mat mp0 = (Mat_<double>(3,1) << 0, 0, 1);
@@ -510,6 +587,7 @@ int main(int argc, char* argv[])
 */
     cvtColor(image, image, CV_RGB2GRAY);
 	Mat drawn_image;
+	H_wi = cameraMatrix*H_wi;  //K*H
 	while (check)
 	{
 		float elapsedTime = Clock.GetElapsedTime();
@@ -545,6 +623,7 @@ int main(int argc, char* argv[])
 			H_ii1 = find_next_homography(image, image_next, keypoints_0, descriptors_0,
 							detector, extractor, matcher, keypoints_next, descriptors_next);
 			H_wi1 = H_ii1 * H_wi;
+			
 			p0_1 = transform_corner(H_wi1, mp0);
 			p1_1 = transform_corner(H_wi1, mp1);
 			p2_1 = transform_corner(H_wi1, mp2);
@@ -556,7 +635,7 @@ int main(int argc, char* argv[])
 			descriptors_0 = descriptors_next;
 			image = image_next; 
 			H_wi = H_wi1;
-			updateSFML( elapsedTime);
+			updateSFML( elapsedTime, image, cameraMatrix, H_wi, s);
 			App.Display();
 		}
 		 

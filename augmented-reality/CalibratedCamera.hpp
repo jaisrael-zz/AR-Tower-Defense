@@ -12,8 +12,10 @@ public:
 	CalibCamera(float fx, float fy, 
 				float cx, float cy); //construct instrinsic camera matrix
 
-    void setInstrinsic(	);
-    void setRT( cv::Matx33f H);	
+	const cv::Matx33f getInstrinsic() const;
+
+    void setInstrinsic( cv::VideoCapture cap ); //use chessboard to calibrate camera
+    void updateRT( cv::Matx33f H ); // RT = RT * h;	
 private:
 	cv::Matx33f K; //intrinsic matrix
 	cv::Matx33f RT; //
