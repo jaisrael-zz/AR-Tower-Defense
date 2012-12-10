@@ -141,7 +141,7 @@ Mat find_next_homography(Mat im, Mat image_next, vector<KeyPoint> keypoints_0, M
 
 }
 
-void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat H, double s)
+void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 {
 	int w = image.cols;
 	int h = image.rows;
@@ -165,7 +165,7 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat H, double s)
  
     const GLfloat bgTextureVertices[] = { 0, 0, w, 0, 0, h, w, h };
 	const GLfloat bgTextureCoords[]   = { 1, 0, 1, 1, 0, 0, 0, 1 };
-  	const GLfloat proj_bg[]              = { 0, -2.f/w, 0, 0, -2.f/h, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1 };
+  	const GLfloat proj_bg[]           = { 0, -2.f/w, 0, 0, -2.f/h, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1 };
 
   	glMatrixMode(GL_PROJECTION);
   	glLoadMatrixf(proj_bg);
@@ -215,52 +215,76 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat H, double s)
 								  2.f*c_x / w - 1, 2.f*c_y / h - 1, -(far+near)/ (far - near), -1.f, 
 								  0, 0, -2.f*far*near / (far - near), 1 };
 	
-    glMatrixMode(GL_PROJECTION);
+/*
+  	const GLfloat proj_camera[] = { f_x, 0, 0, 0, 
+								    0, f_y, 0, 0, 
+								  c_x, c_y, 1, 1, 
+								  0, 0, 1, 0 };
+    */
+	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-  	//glLoadMatrixf(proj_bg);
+  	glLoadMatrixf(proj_camera);
     //fov, aspect ratio, nearclip, farclip
-    gluPerspective(90.f, 1.f, 1.f, 500.f);
-    
+    //gluPerspective(90.f, 1.f, 1.f, 500.f);
+   
+	Mat r0 = RT.col(0);
+	Mat r1 = RT.col(1); 
+
+	Mat r2 = r0.cross(r1);
+	Mat t = RT.col(2);
+  	const GLfloat RT_Camera[] = { r0.data[0], r0.data[1], r0.data[2], 0,
+								  r1.data[0], r1.data[1], r1.data[2], 0,
+								  r2.data[0], r2.data[1], r2.data[2], 0,
+						    	   t.data[0],  t.data[1],  t.data[2], 1 };
+	 	
+ 	//RT matrix (modelview) for camera
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(0.f, 0.f, -200.f);
-    glRotatef(elapsedTime*50, 1.f, 0.f, 0.f);
-    glRotatef(elapsedTime*30, 0.f, 1.f, 0.f);
-    glRotatef(elapsedTime*90, 0.f, 0.f, 1.f);
+	glLoadMatrixf(RT_Camera);
 
+	
+
+	//draw the cube
     glBegin(GL_QUADS);
 
-    glVertex3f(-50.f, -50.f, -50.f);
-    glVertex3f(-50.f,  50.f, -50.f);
-    glVertex3f( 50.f,  50.f, -50.f);
-    glVertex3f( 50.f, -50.f, -50.f);
 
-    glVertex3f(-50.f, -50.f, 50.f);
-    glVertex3f(-50.f,  50.f, 50.f);
-    glVertex3f( 50.f,  50.f, 50.f);
-    glVertex3f( 50.f, -50.f, 50.f);
+	//front
+    glVertex3f(   0,   0,   0);
+    glVertex3f( len,   0,   0);
+    glVertex3f( len, len,   0);
+    glVertex3f(   0, len,   0);
 
-    glVertex3f(-50.f, -50.f, -50.f);
-    glVertex3f(-50.f,  50.f, -50.f);
-    glVertex3f(-50.f,  50.f,  50.f);
-    glVertex3f(-50.f, -50.f,  50.f);
+	//left
+    glVertex3f(   0,   0,   0);
+    glVertex3f(   0,   0, len);
+    glVertex3f(   0, len, len);
+    glVertex3f(   0, len,   0);
 
-    glVertex3f(50.f, -50.f, -50.f);
-    glVertex3f(50.f,  50.f, -50.f);
-    glVertex3f(50.f,  50.f,  50.f);
-    glVertex3f(50.f, -50.f,  50.f);
+	//bottom
+    glVertex3f(   0,   0,   0);
+    glVertex3f( len,   0,   0);
+    glVertex3f( len,   0, len);
+    glVertex3f(   0,   0, len);
 
-    glVertex3f(-50.f, -50.f,  50.f);
-    glVertex3f(-50.f, -50.f, -50.f);
-    glVertex3f( 50.f, -50.f, -50.f);
-    glVertex3f( 50.f, -50.f,  50.f);
+	//right
+    glVertex3f( len,   0,   0);
+    glVertex3f( len,   0, len);
+    glVertex3f( len, len, len);
+    glVertex3f( len, len,   0);
+	
+	//top
+    glVertex3f(   0, len,   0);
+    glVertex3f(   0, len, len);
+    glVertex3f( len, len, len);
+    glVertex3f( len, len,   0);
 
-    glVertex3f(-50.f, 50.f,  50.f);
-    glVertex3f(-50.f, 50.f, -50.f);
-    glVertex3f( 50.f, 50.f, -50.f);
-    glVertex3f( 50.f, 50.f,  50.f);
-
-    glEnd();
+	//back
+    glVertex3f(   0, len, len);
+    glVertex3f( len, len, len);
+    glVertex3f( len,   0, len);
+    glVertex3f( len,   0, len);
+    
+	glEnd();
 
 	
 
@@ -588,6 +612,7 @@ int main(int argc, char* argv[])
     cvtColor(image, image, CV_RGB2GRAY);
 	Mat drawn_image;
 	H_wi = cameraMatrix*H_wi;  //K*H
+	Mat RT;
 	while (check)
 	{
 		float elapsedTime = Clock.GetElapsedTime();
@@ -601,7 +626,8 @@ int main(int argc, char* argv[])
     		cvtColor(image_next, image_next, CV_RGB2GRAY);	
 			H_ii1 = find_next_homography(image, image_next, keypoints_0, descriptors_0,
 							detector, extractor, matcher, keypoints_next, descriptors_next);
-			H_wi1 = H_ii1 * H_wi;
+			//H_wi1 = H_ii1 * H_wi;
+			H_wi1 = H_wi * H_ii1;
 			p0_1 = transform_corner(H_wi1, mp0);
 			p1_1 = transform_corner(H_wi1, mp1);
 			p2_1 = transform_corner(H_wi1, mp2);
@@ -623,11 +649,13 @@ int main(int argc, char* argv[])
 			H_ii1 = find_next_homography(image, image_next, keypoints_0, descriptors_0,
 							detector, extractor, matcher, keypoints_next, descriptors_next);
 			H_wi1 = H_ii1 * H_wi;
-			
-			p0_1 = transform_corner(H_wi1, mp0);
-			p1_1 = transform_corner(H_wi1, mp1);
-			p2_1 = transform_corner(H_wi1, mp2);
-			p3_1 = transform_corner(H_wi1, mp3);
+			//H_wi1 = H_wi * H_ii1;
+			RT = K_inv*H_wi;		
+	
+			p0_1 = transform_corner(cameraMatrix*RT, mp0);
+			p1_1 = transform_corner(cameraMatrix*RT, mp1);
+			p2_1 = transform_corner(cameraMatrix*RT, mp2);
+			p3_1 = transform_corner(cameraMatrix*RT, mp3);
 			
 			drawPlane(drawn_image, p0_1, p1_1, p2_1, p3_1);
 			imshow("H_ii1", drawn_image);
@@ -635,7 +663,7 @@ int main(int argc, char* argv[])
 			descriptors_0 = descriptors_next;
 			image = image_next; 
 			H_wi = H_wi1;
-			updateSFML( elapsedTime, image, cameraMatrix, H_wi, s);
+			updateSFML( elapsedTime, image, cameraMatrix, RT, s);
 			App.Display();
 		}
 		 
