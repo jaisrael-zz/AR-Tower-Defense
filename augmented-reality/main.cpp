@@ -8,7 +8,7 @@
 //#include <GL/glew.h>
 //#include <GL/gl.h>
 //#include <GL/glu.h>
-#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <algorithm>
 #include "math.h"
@@ -43,10 +43,10 @@ static void onMouse(int event, int x, int y, int, void*)
 		default:
 			color = Scalar(0,255,255);
 	}
-	Point center = Point(x,y);
+	Point center = Point(x, y);
 	im0_corners[clicks] = center; 
 	//circle(image, center, 4, color, -1); 
-    cout << "(" << x << "," << y << ")" << endl;
+    cout << "(" << center.x << "," << center.y << ")" << endl;
 	clicks++;
 	
 }
@@ -166,6 +166,8 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
     const GLfloat bgTextureVertices[] = { 0, 0, w, 0, 0, h, w, h };
 	const GLfloat bgTextureCoords[]   = { 1, 0, 1, 1, 0, 0, 0, 1 };
   	const GLfloat proj_bg[]           = { 0, -2.f/w, 0, 0, -2.f/h, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1 };
+	
+
 
   	glMatrixMode(GL_PROJECTION);
   	glLoadMatrixf(proj_bg);
@@ -197,54 +199,142 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 	if (s < 1)	len = s;
 	if (1 >= s) len = 1;
 	
-	float near = 0.1;
+	float near = 0.1f;
 	float far = 100.f;
 
 	//build projection matrix from K
-	float f_x = K.data[0];
-	float f_y = K.data[4];
+	float f_x = K.at<double>(0,0);
+	float f_y = K.at<double>(1,1);
 	//float f_z = K.data[4];  //maybe its f_z?
-	float c_x = K.data[2];
-	float c_y = K.data[5]; 
-	//float c_z = K.data[5]; i
+	float c_x = K.at<double>(0,2);
+	float c_y = K.at<double>(1,2); 
+	//float c_z = K.data[5];
+	float L = 0;
+	float R = w;
+	float B = 0;
+	float T = h;
+
+	
+	const GLfloat proj_camera[] = { -2.0f*f_x/w, 0, 0, 0,
+							  0, 2.0f*f_y / h, 0, 0,
+							  2.0*c_x / w - 1.0f, 2.0*c_y / h - 1.0f, -(far+near)/(far-near), -1.0,
+							  0.0, 0.0, -2.0*far*near/(far-near), 1 };
+	
+	cout << "proj: " << endl;
+
+	for (int i = 0; i < 16; i++)
+	{
+		cout << proj_camera[i] << " ";
+		if (i % 4 == 3) cout << endl;
+	}
+ 
+/*
+
+	//column major order
+	const GLfloat ortho[] = { 2.0f/(R-L), 0, 0, 0,
+							  0, 2.0f/(T-B), 0, 0,
+							  0, 0, -2.0f/(far - near), 0,
+							  -(R+L)/(R-L), -(T+B)/(T-B), -(far+near)/(far-near), 1 };
+
+	cout << "ortho: " << endl;
+
+	for (int i = 0; i < 16; i++)
+	{
+		cout << ortho[i] << " ";
+		if (i % 4 == 3) cout << endl;
+	} 
 
 	//remember this is in column major order!!!!
 	//so its actually the transpose of what it looks like!
-  	const GLfloat proj_camera[] = { -2.f*f_x / w, 0, 0, 0, 
-								    0, -2.f*f_y/ h, 0, 0, 
-								  2.f*c_x / w - 1, 2.f*c_y / h - 1, -(far+near)/ (far - near), -1.f, 
-								  0, 0, -2.f*far*near / (far - near), 1 };
-	
-/*
   	const GLfloat proj_camera[] = { f_x, 0, 0, 0, 
 								    0, f_y, 0, 0, 
-								  c_x, c_y, 1, 1, 
-								  0, 0, 1, 0 };
-    */
+								    -c_x, -c_y, near+far, -1.f, 
+								     0, 0, near*far, 1 };
+	cout << "proj: " << endl;
+
+	for (int i = 0; i < 16; i++)
+	{
+		cout << proj_camera[i] << " ";
+		if (i % 4 == 3) cout << endl;
+	} 
+*/
+
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-  	glLoadMatrixf(proj_camera);
+	//glMultMatrixf(ortho);
+  	glMultMatrixf(proj_camera);
     //fov, aspect ratio, nearclip, farclip
     //gluPerspective(90.f, 1.f, 1.f, 500.f);
-   
+/*   
 	Mat r0 = RT.col(0);
+	Size s0 = r0.size();
+	cout << "r0 " << r0 << endl;
+	cout << "r0[0] " << r0.at<double>(0) << endl;
+	cout << "r0[1] " << r0.at<double>(1) << endl;
+	cout << "r0[2] " << r0.at<double>(2) << endl;
+
 	Mat r1 = RT.col(1); 
+	cout << "r1 " << r1 << endl;
 
 	Mat r2 = r0.cross(r1);
+	cout << "r2 " << r2 << endl;
 	Mat t = RT.col(2);
-  	const GLfloat RT_Camera[] = { r0.data[0], r0.data[1], r0.data[2], 0,
-								  r1.data[0], r1.data[1], r1.data[2], 0,
-								  r2.data[0], r2.data[1], r2.data[2], 0,
-						    	   t.data[0],  t.data[1],  t.data[2], 1 };
+	cout << "t " << t << endl;
+  	const GLfloat RT_Camera[] = { r0.at<double>(0), r0.at<double>(1), r0.at<double>(2), 0,
+								  -r2.at<double>(0), -r2.at<double>(1), -r2.at<double>(2), 0,
+								  -r1.at<double>(0), -r1.at<double>(1), -r1.at<double>(2), 0,
+						    	   t.at<double>(0),  -t.at<double>(1),  -t.at<double>(2), 1 };
+	cout << "RT: " << endl;
+
+	for (int i = 0; i < 16; i++)
+	{
+		cout << RT_Camera[i] << " ";
+		if (i % 4 == 3) cout << endl;
+	} 
 	 	
  	//RT matrix (modelview) for camera
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-	glLoadMatrixf(RT_Camera);
+	glMultMatrixf(RT_Camera);
 
+*/
+	//PnP method
+	Mat r0 = RT.col(0);
+	Mat r1 = RT.col(1);
+	Mat r2 = RT.col(2);
+	Mat t = RT.col(3);
+/*
+  	const GLfloat RT_Camera[] = { r0.at<double>(0), r0.at<double>(1), r0.at<double>(2), 0,
+								  -r1.at<double>(0), -r1.at<double>(1), -r1.at<double>(2), 0,
+								  -r2.at<double>(0), -r2.at<double>(1), -r2.at<double>(2), 0,
+						    	   t.at<double>(0),  -t.at<double>(1),  -t.at<double>(2), 1 };
+  */	
+	const GLfloat RT_Camera[] = { r0.at<double>(0), r0.at<double>(1), r0.at<double>(2), 0,
+								  r1.at<double>(0), r1.at<double>(1), r1.at<double>(2), 0,
+								  r2.at<double>(0), r2.at<double>(1), r2.at<double>(2), 0,
+						    	   t.at<double>(0),  t.at<double>(1),  t.at<double>(2), 1 };
 	
 
+	glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+	glMultMatrixf(RT_Camera);
+
+
+/*
+	//draw planes
+	glBegin(GL_QUADS);
+	
+
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, s, 0);
+	glVertex3f(1, s, 0);
+	glVertex3f(1, 0, 0);
+	
+	glEnd();
+*/
+	len = len/2;	
 	//draw the cube
+	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     glBegin(GL_QUADS);
 
 
@@ -282,10 +372,11 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
     glVertex3f(   0, len, len);
     glVertex3f( len, len, len);
     glVertex3f( len,   0, len);
-    glVertex3f( len,   0, len);
+    glVertex3f( 0,   0, len);
     
 	glEnd();
-
+	
+	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	
 
 }
@@ -332,8 +423,8 @@ int main(int argc, char* argv[])
 
 
 	sf::Clock Clock;
-	sf::Window App(sf::VideoMode(image.cols, image.rows, 32), "SFML window");
-	
+	sf::RenderWindow App(sf::VideoMode(image.cols, image.rows, 32), "SFML window");
+    App.Clear(sf::Color(255,0,0));	
 
 	//imshow("Click Points", image);
 	cout << "Camera Calibration" << endl;
@@ -399,12 +490,18 @@ int main(int argc, char* argv[])
 	cout << "reprojection error: " << rpe << endl;
     */
 	Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
-	Mat distCoeffs = Mat::zeros(8, 1, CV_64F);
+	Mat distCoeffs = Mat::zeros(5, 1, CV_64F);
 	cameraMatrix.at<double>(0,0) = 805.681948728115;
 	cameraMatrix.at<double>(0,2) = 322.6647811002137;
 	cameraMatrix.at<double>(1,1) = 805.3642730837905;
 	cameraMatrix.at<double>(1,2) = 231.1740947838633;
 	double rpe = 0.273059;
+
+	distCoeffs.at<double>(0) = 0.04757978134005677;
+	distCoeffs.at<double>(1) = -0.5350403941017606;
+	distCoeffs.at<double>(2) = 0.000850515369893481;
+	distCoeffs.at<double>(3) = -0.001186128332274569;
+	distCoeffs.at<double>(4) = 2.20855766783285;
 
 	check = 1;
 	cout << "Click 4 points of your plane" << endl;
@@ -474,12 +571,12 @@ int main(int argc, char* argv[])
 	Mat mp2 = (Mat_<double>(3,1) << 1, s, 1);
 	Mat mp3 = (Mat_<double>(3,1) << 1, 0, 1);
 
-	Point p0 = transform_corner(H_wi, mp0);
-	Point p1 = transform_corner(H_wi, mp1);
-	Point p2 = transform_corner(H_wi, mp2);
-	Point p3 = transform_corner(H_wi, mp3);
+	Point p0 = transform_corner(cameraMatrix*H_wi, mp0);
+	Point p1 = transform_corner(cameraMatrix*H_wi, mp1);
+	Point p2 = transform_corner(cameraMatrix*H_wi, mp2);
+	Point p3 = transform_corner(cameraMatrix*H_wi, mp3);
 
-/*
+
 	cout << "Testing H_w0..." << endl;
 	circle(image, p0, 4, Scalar(255,255,255), -1); 
 	circle(image, p1, 4, Scalar(255,255,0), -1); 
@@ -492,7 +589,53 @@ int main(int argc, char* argv[])
 		 << "(" << p1.x << "," << p1.y << ")" << endl
 		 << "(" << p2.x << "," << p2.y << ")" << endl
 		 << "(" << p3.x << "," << p3.y << ")" << endl;
-*/
+	
+	Mat RT_0 = H_wi;
+	cout << "RT_0: " << endl << RT_0 << endl;
+	cout << "H: " << endl << (cameraMatrix*RT_0) << endl;
+	cout << "K: " << endl << cameraMatrix << endl;
+
+	vector<Point3f> obj_points(4);
+	obj_points[0] = Point3f(0.0f,0.0f,0.0f);
+	obj_points[1] = Point3f(0.0f,s,0.0f);
+	obj_points[2] = Point3f(1.0f,s,0.0f);
+	obj_points[3] = Point3f(1.0f,0.0f,0.0f);
+
+	vector<Point2f> img_points(4);
+	img_points[0] = p0;
+	img_points[1] = p1;
+	img_points[2] = p2;
+	img_points[3] = p3;
+
+	Mat rvec, tvec, rmat;
+	solvePnP(obj_points, img_points, cameraMatrix, distCoeffs, rvec, tvec);	
+	Rodrigues(rvec,rmat);
+
+	cout << "rvec: " << rvec << endl;	
+	cout << "tvec: " << tvec << endl;	
+	cout << "rmat: " << rmat << endl;
+
+	Mat RT_pnp = Mat::eye(4, 4, CV_64F);
+	rmat.copyTo(RT_pnp(Rect(0, 0, 3, 3)));
+	tvec.copyTo(RT_pnp(Rect(3, 0, 1, 3)));
+
+	cout << "rtpnp: " << RT_pnp << endl;
+	Mat RT_pnp_inv = Mat::eye(4, 4, CV_64F);
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			RT_pnp_inv.at<double>(i,j) = RT_pnp.at<double>(j,i);
+		}
+	}
+	RT_pnp_inv.at<double>(0,3) = -1*RT_pnp.at<double>(0,3);
+	RT_pnp_inv.at<double>(1,3) = -1*RT_pnp.at<double>(1,3);
+	RT_pnp_inv.at<double>(2,3) = -1*RT_pnp.at<double>(2,3);
+	cout << "rtpnpinv: " << RT_pnp_inv << endl;
+    
+	//updateSFML( 0, image, cameraMatrix, RT_pnp, s);
+	updateSFML( 0, image, cameraMatrix, RT_pnp_inv, s);
+	App.Display();
 
 /*	vector<Point2f> rect_corners(4);
 	rect_corners[0] = Point(0,500*s); //bottom left
@@ -613,6 +756,13 @@ int main(int argc, char* argv[])
 	Mat drawn_image;
 	H_wi = cameraMatrix*H_wi;  //K*H
 	Mat RT;
+
+	Mat RT_pnp1 = Mat::zeros(4, 4, CV_64F);
+	Mat diff = Mat::zeros(4, 4, CV_64F);
+
+	Mat rvec1, tvec1, rmat1;	
+	vector<Point2f> img_points1(4);
+	Mat RT_pnp1_inv = Mat::eye(4, 4, CV_64F);
 	while (check)
 	{
 		float elapsedTime = Clock.GetElapsedTime();
@@ -628,6 +778,8 @@ int main(int argc, char* argv[])
 							detector, extractor, matcher, keypoints_next, descriptors_next);
 			//H_wi1 = H_ii1 * H_wi;
 			H_wi1 = H_wi * H_ii1;
+			RT = K_inv * H_wi;
+
 			p0_1 = transform_corner(H_wi1, mp0);
 			p1_1 = transform_corner(H_wi1, mp1);
 			p2_1 = transform_corner(H_wi1, mp2);
@@ -639,6 +791,8 @@ int main(int argc, char* argv[])
 			descriptors_0 = descriptors_next;
 			image = image_next; 
 			H_wi = H_wi1;
+			updateSFML( elapsedTime, image, cameraMatrix, RT, s);
+			App.Display();
 		default:
 			break;
 		}
@@ -650,20 +804,58 @@ int main(int argc, char* argv[])
 							detector, extractor, matcher, keypoints_next, descriptors_next);
 			H_wi1 = H_ii1 * H_wi;
 			//H_wi1 = H_wi * H_ii1;
-			RT = K_inv*H_wi;		
+			//RT = K_inv*H_wi;		
 	
-			p0_1 = transform_corner(cameraMatrix*RT, mp0);
-			p1_1 = transform_corner(cameraMatrix*RT, mp1);
-			p2_1 = transform_corner(cameraMatrix*RT, mp2);
-			p3_1 = transform_corner(cameraMatrix*RT, mp3);
-			
+			p0_1 = transform_corner(H_wi1, mp0);
+			p1_1 = transform_corner(H_wi1, mp1);
+			p2_1 = transform_corner(H_wi1, mp2);
+			p3_1 = transform_corner(H_wi1, mp3);
+	
+			img_points1[0] = p0_1;
+			img_points1[1] = p1_1;
+			img_points1[2] = p2_1;
+			img_points1[3] = p3_1;
+
+	
+			solvePnP(obj_points, img_points1, cameraMatrix, distCoeffs, rvec1, tvec1);	
+			Rodrigues(rvec1,rmat1);
+	
+			rmat1.copyTo(RT_pnp1(Rect(0, 0, 3, 3)));
+			tvec1.copyTo(RT_pnp1(Rect(3, 0, 1, 3)));
+			for (int i = 0; i < 3; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					RT_pnp1_inv.at<double>(i,j) = RT_pnp1.at<double>(j,i);
+				}
+			}
+			RT_pnp1_inv.at<double>(0,3) = -1*RT_pnp1.at<double>(0,3);
+			RT_pnp1_inv.at<double>(1,3) = -1*RT_pnp1.at<double>(1,3);
+			RT_pnp1_inv.at<double>(2,3) = -1*RT_pnp1.at<double>(2,3);
+
+			//RT_pnp1.at<double>(0,3) = RT_pnp1_inv.at<double>(0,3);
+			//RT_pnp1.at<double>(1,3) = RT_pnp1_inv.at<double>(1,3);
+			//RT_pnp1.at<double>(2,3) = RT_pnp1_inv.at<double>(2,3);
+
+			diff = RT_pnp1 - RT_pnp;
+			//cout << "RT_pnp1: " << RT_pnp1 << endl;
+			//cout << "RT_pnp: " << RT_pnp << endl;
+			//cout << "diff: " << diff << endl;
+
+			//RT_pnp1 = RT_pnp1 - 2*diff;
+			//RT_pnp1.at<double>(0,3) = RT_pnp1.at<double>(0,3) - 2*diff.at<double>(0,3);	
+			//RT_pnp1.at<double>(1,3) = RT_pnp1.at<double>(1,3) - 2*diff.at<double>(1,3);	
+			//RT_pnp1.at<double>(2,3) = RT_pnp1.at<double>(2,3) - 2*diff.at<double>(2,3);	
 			drawPlane(drawn_image, p0_1, p1_1, p2_1, p3_1);
 			imshow("H_ii1", drawn_image);
 			keypoints_0 = keypoints_next;
 			descriptors_0 = descriptors_next;
 			image = image_next; 
 			H_wi = H_wi1;
-			updateSFML( elapsedTime, image, cameraMatrix, RT, s);
+			updateSFML( elapsedTime, image, cameraMatrix, RT_pnp1_inv, s);
+			//RT_pnp1 = RT_pnp1 + 2*diff;
+			//RT_pnp = ;
+			//RT_pnp1.copyTo(RT_pnp);
 			App.Display();
 		}
 		 

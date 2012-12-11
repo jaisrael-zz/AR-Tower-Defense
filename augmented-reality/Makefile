@@ -6,7 +6,7 @@ CFLAGS = -Wall -g
 CXXFLAGS += `pkg-config opencv --cflags` -D ENABLE_OPENGL=YES
 
 #Linking
-LDFLAGS += -lm `pkg-config opencv --libs` -lsfml-window -lsfml-system -lGL -lGLU -lGLEW
+LDFLAGS += -lm `pkg-config opencv --libs` -lsfml-graphics -lsfml-window -lsfml-system -lGL -lGLU -lGLEW
 
 all = AugmentedReality
 all: $(all)
