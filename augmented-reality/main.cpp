@@ -45,7 +45,7 @@ static void onMouse(int event, int x, int y, int, void*)
 	}
 	Point center = Point(x, y);
 	im0_corners[clicks] = center; 
-	//circle(image, center, 4, color, -1); 
+	circle(image, center, 4, color, -1); 
     cout << "(" << center.x << "," << center.y << ")" << endl;
 	clicks++;
 	
@@ -197,7 +197,7 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 	//draw the cube according to the camera matrix 
 	float len;
 	if (s < 1)	len = s;
-	if (1 >= s) len = 1;
+	if (1 <= s) len = 1;
 	
 	float near = 0.1f;
 	float far = 100.f;
@@ -217,7 +217,7 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 	
 	const GLfloat proj_camera[] = { -2.0f*f_x/w, 0, 0, 0,
 							  0, 2.0f*f_y / h, 0, 0,
-							  2.0*c_x / w - 1.0f, 2.0*c_y / h - 1.0f, -(far+near)/(far-near), -1.0,
+							  2.0*c_x / w -1.0, 2.0*c_y / h - 1.0, -(far+near)/(far-near), -1.0,
 							  0.0, 0.0, -2.0*far*near/(far-near), 1 };
 	
 	cout << "proj: " << endl;
@@ -228,8 +228,8 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 		if (i % 4 == 3) cout << endl;
 	}
  
-/*
 
+/*
 	//column major order
 	const GLfloat ortho[] = { 2.0f/(R-L), 0, 0, 0,
 							  0, 2.0f/(T-B), 0, 0,
@@ -257,32 +257,24 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 		cout << proj_camera[i] << " ";
 		if (i % 4 == 3) cout << endl;
 	} 
-*/
 
+*/
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 	//glMultMatrixf(ortho);
   	glMultMatrixf(proj_camera);
     //fov, aspect ratio, nearclip, farclip
     //gluPerspective(90.f, 1.f, 1.f, 500.f);
-/*   
+/*	
 	Mat r0 = RT.col(0);
-	Size s0 = r0.size();
-	cout << "r0 " << r0 << endl;
-	cout << "r0[0] " << r0.at<double>(0) << endl;
-	cout << "r0[1] " << r0.at<double>(1) << endl;
-	cout << "r0[2] " << r0.at<double>(2) << endl;
 
 	Mat r1 = RT.col(1); 
-	cout << "r1 " << r1 << endl;
 
 	Mat r2 = r0.cross(r1);
-	cout << "r2 " << r2 << endl;
 	Mat t = RT.col(2);
-	cout << "t " << t << endl;
   	const GLfloat RT_Camera[] = { r0.at<double>(0), r0.at<double>(1), r0.at<double>(2), 0,
-								  -r2.at<double>(0), -r2.at<double>(1), -r2.at<double>(2), 0,
 								  -r1.at<double>(0), -r1.at<double>(1), -r1.at<double>(2), 0,
+								  -r2.at<double>(0), -r2.at<double>(1), -r2.at<double>(2), 0,
 						    	   t.at<double>(0),  -t.at<double>(1),  -t.at<double>(2), 1 };
 	cout << "RT: " << endl;
 
@@ -303,79 +295,158 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 	Mat r1 = RT.col(1);
 	Mat r2 = RT.col(2);
 	Mat t = RT.col(3);
+  	
 /*
-  	const GLfloat RT_Camera[] = { r0.at<double>(0), r0.at<double>(1), r0.at<double>(2), 0,
+	const GLfloat RT_Camera[] = { r0.at<double>(0), r0.at<double>(1), r0.at<double>(2), 0,
 								  -r1.at<double>(0), -r1.at<double>(1), -r1.at<double>(2), 0,
 								  -r2.at<double>(0), -r2.at<double>(1), -r2.at<double>(2), 0,
 						    	   t.at<double>(0),  -t.at<double>(1),  -t.at<double>(2), 1 };
-  */	
-	const GLfloat RT_Camera[] = { r0.at<double>(0), r0.at<double>(1), r0.at<double>(2), 0,
-								  r1.at<double>(0), r1.at<double>(1), r1.at<double>(2), 0,
-								  r2.at<double>(0), r2.at<double>(1), r2.at<double>(2), 0,
-						    	   t.at<double>(0),  t.at<double>(1),  t.at<double>(2), 1 };
 	
+	cout << "RT: " << endl;
+
+	for (int i = 0; i < 16; i++)
+	{
+		cout << RT_Camera[i] << " ";
+		if (i % 4 == 3) cout << endl;
+	} 
+*/	
+	//diff inv;
+	//Mat d0 = diff_inv.col(0);
+	//Mat d1 = diff_inv.col(1);
+	//Mat d2 = diff_inv.col(2);
+	//Mat dt = diff_inv.col(3);
+
+	const GLfloat RT_Camera[] = { r0.at<double>(0), r1.at<double>(0), r2.at<double>(0), 0,
+								  -r0.at<double>(1), -r1.at<double>(1), -r2.at<double>(1), 0,
+								  -r0.at<double>(2), -r1.at<double>(2), -r2.at<double>(2), 0,
+						    	   t.at<double>(0),  t.at<double>(1),  t.at<double>(2), 1 };
 
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 	glMultMatrixf(RT_Camera);
+	//glMultMatrixf(diff_mv);
 
 
 /*
 	//draw planes
 	glBegin(GL_QUADS);
 	
-
+    glColor3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(-1, 1, 0);
+    glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(0, 1, 0);
+    glColor3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(0, 0, 0);
-	glVertex3f(0, s, 0);
-	glVertex3f(1, s, 0);
-	glVertex3f(1, 0, 0);
-	
+    glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(-1, 0, 0);
+*/	
 	glEnd();
-*/
-	len = len/2;	
+
+	len = len/2;
+
+    glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
 	//draw the cube
-	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
+	//glTranslatef(-0.0f,-0.5f,0.0f);	
+	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
     glBegin(GL_QUADS);
 
-
-	//front
-    glVertex3f(   0,   0,   0);
-    glVertex3f( len,   0,   0);
-    glVertex3f( len, len,   0);
-    glVertex3f(   0, len,   0);
-
+	// 0 = -len/4, len = len/4
 	//left
-    glVertex3f(   0,   0,   0);
-    glVertex3f(   0,   0, len);
-    glVertex3f(   0, len, len);
-    glVertex3f(   0, len,   0);
-
-	//bottom
-    glVertex3f(   0,   0,   0);
-    glVertex3f( len,   0,   0);
-    glVertex3f( len,   0, len);
-    glVertex3f(   0,   0, len);
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 0, len);
+	glVertex3f(0, len, len);
+	glVertex3f(0, len, 0);
 
 	//right
-    glVertex3f( len,   0,   0);
-    glVertex3f( len,   0, len);
-    glVertex3f( len, len, len);
-    glVertex3f( len, len,   0);
+	glVertex3f(-len, 0, len);
+	glVertex3f(-len, len, len);
+	glVertex3f(-len, len, 0);
+	glVertex3f(-len, 0, 0);
 	
 	//top
-    glVertex3f(   0, len,   0);
-    glVertex3f(   0, len, len);
-    glVertex3f( len, len, len);
-    glVertex3f( len, len,   0);
+	glVertex3f(0, 0, len);
+	glVertex3f(0, len, len);
+	glVertex3f(-len, len, len);
+	glVertex3f(-len, 0, len);
 
 	//back
-    glVertex3f(   0, len, len);
-    glVertex3f( len, len, len);
-    glVertex3f( len,   0, len);
-    glVertex3f( 0,   0, len);
-    
-	glEnd();
+	//glColor3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0, len, 0);
+	glVertex3f(0, len, len);
+	glVertex3f(-len, len, len);
+	glVertex3f(-len, len, 0);
 	
+	//front
+	//glColor3f(0.f,0.f,1.0f);
+	glVertex3f(0, 0, 0);
+	glVertex3f(-len, 0, 0);
+	glVertex3f(-len, 0, len);
+	glVertex3f(0, 0, len);
+
+	//bottom
+	//glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(   -len,   len,   0); //bottomrightback
+    glVertex3f(   0,    len,   0); //bottomleftback
+    glVertex3f(   0,    0,   0); //bottomleftfront
+    glVertex3f(   -len,   0,   0); //bottomrightfront
+	glEnd();
+/*    
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(-1, 1, 0);
+    glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(0, 1, 0);
+    glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0, 0, 0);
+    glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(-1, 0, 0);
+*/	
+
+	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+	glColor3f(0.0f, 0.0f, 0.0f); 
+	glBegin(GL_QUADS);
+
+	// 0 = -len/4, len = len/4
+	//left
+	glVertex3f(0, 0, 0);
+	glVertex3f(0, 0, len);
+	glVertex3f(0, len, len);
+	glVertex3f(0, len, 0);
+
+	//right
+	glVertex3f(-len, 0, len);
+	glVertex3f(-len, len, len);
+	glVertex3f(-len, len, 0);
+	glVertex3f(-len, 0, 0);
+	
+	//top
+	glVertex3f(0, 0, len);
+	glVertex3f(0, len, len);
+	glVertex3f(-len, len, len);
+	glVertex3f(-len, 0, len);
+
+	//back
+	//glColor3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(0, len, 0);
+	glVertex3f(0, len, len);
+	glVertex3f(-len, len, len);
+	glVertex3f(-len, len, 0);
+	
+	//front
+	//glColor3f(0.f,0.f,1.0f);
+	glVertex3f(0, 0, 0);
+	glVertex3f(-len, 0, 0);
+	glVertex3f(-len, 0, len);
+	glVertex3f(0, 0, len);
+
+	//bottom
+	//glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(   -len,   len,   0); //bottomrightback
+    glVertex3f(   0,    len,   0); //bottomleftback
+    glVertex3f(   0,    0,   0); //bottomleftfront
+    glVertex3f(   -len,   0,   0); //bottomrightfront
+	glEnd();
+	glColor3f(1.0f, 1.0f, 1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	
 
@@ -383,6 +454,8 @@ void updateSFML(float elapsedTime, Mat backgroundImage, Mat K, Mat RT, double s)
 
 int main(int argc, char* argv[])
 {
+
+	glViewport(0,0, 640, 480);
 	texture_created = 0;	
 	/* Enable smooth shading */
     glShadeModel( GL_SMOOTH );
@@ -631,8 +704,14 @@ int main(int argc, char* argv[])
 	RT_pnp_inv.at<double>(0,3) = -1*RT_pnp.at<double>(0,3);
 	RT_pnp_inv.at<double>(1,3) = -1*RT_pnp.at<double>(1,3);
 	RT_pnp_inv.at<double>(2,3) = -1*RT_pnp.at<double>(2,3);
+	
+	//invert(RT_pnp, RT_pnp_inv);
 	cout << "rtpnpinv: " << RT_pnp_inv << endl;
+
+	Mat pnp_inv = Mat::eye(4,4,CV_64F);
+	invert(RT_pnp_inv, pnp_inv);
     
+	//updateSFML( 0, image, cameraMatrix, (K_inv*RT_0), s);
 	//updateSFML( 0, image, cameraMatrix, RT_pnp, s);
 	updateSFML( 0, image, cameraMatrix, RT_pnp_inv, s);
 	App.Display();
@@ -686,19 +765,16 @@ int main(int argc, char* argv[])
 	//detector->detect(rectified_plane, keypoints_0);
 
 	//Ptr<DescriptorExtractor> extractor = Ptr<DescriptorExtractor>(new SurfDescriptorExtractor());
-	//Ptr<DescriptorExtractor> extractor = Ptr<BriskExtractor>(new BriskDescriptorExtractor());
-	Ptr<DescriptorExtractor> extractor = Ptr<DescriptorExtractor>(new ORB());
+    Ptr<DescriptorExtractor> extractor = Ptr<DescriptorExtractor>(new ORB());
     //Ptr<DescriptorExtractor> extractor = Ptr<DescriptorExtractor>(new FREAK());
 
 	Mat descriptors_0, descriptors_next;
 	extractor->compute(image, keypoints_0, descriptors_0);
 	//extractor->compute(rectified_plane, keypoints_0, descriptors_0);
 
-	//FlannBasedMatcher matcher;
 	//Ptr<DescriptorMatcher> matcher = Ptr<DescriptorMatcher>(new BFMatcher(NORM_L2, true));
 	Ptr<DescriptorMatcher> matcher = Ptr<DescriptorMatcher>(new BFMatcher(NORM_HAMMING, true));
 	//Ptr<DescriptorMatcher> matcher = Ptr<DescriptorMatcher>(new FlannBasedMatcher());
-	//BFMatcher matcher(NORM_HAMMING, true);
 	char key = 0;
 	Mat H_ii1, H_wi1;
 	Point p0_1, p1_1, p2_1, p3_1;
@@ -757,15 +833,15 @@ int main(int argc, char* argv[])
 	H_wi = cameraMatrix*H_wi;  //K*H
 	Mat RT;
 
-	Mat RT_pnp1 = Mat::zeros(4, 4, CV_64F);
+	Mat RT_pnp1 = Mat::eye(4, 4, CV_64F);
 	Mat diff = Mat::zeros(4, 4, CV_64F);
 
 	Mat rvec1, tvec1, rmat1;	
 	vector<Point2f> img_points1(4);
 	Mat RT_pnp1_inv = Mat::eye(4, 4, CV_64F);
+	Mat diff_inv = Mat::eye(4, 4, CV_64F);
 	while (check)
 	{
-		float elapsedTime = Clock.GetElapsedTime();
 		key = waitKey(1);
 		switch(key) {
 		case 'q':
@@ -791,7 +867,7 @@ int main(int argc, char* argv[])
 			descriptors_0 = descriptors_next;
 			image = image_next; 
 			H_wi = H_wi1;
-			updateSFML( elapsedTime, image, cameraMatrix, RT, s);
+			//updateSFML( elapsedTime, image, cameraMatrix, RT, s);
 			App.Display();
 		default:
 			break;
@@ -822,6 +898,10 @@ int main(int argc, char* argv[])
 	
 			rmat1.copyTo(RT_pnp1(Rect(0, 0, 3, 3)));
 			tvec1.copyTo(RT_pnp1(Rect(3, 0, 1, 3)));
+
+			cout << "RT_pnp1: " << RT_pnp1 << endl;
+
+			
 			for (int i = 0; i < 3; i++)
 			{
 				for (int j = 0; j < 3; j++)
@@ -833,11 +913,23 @@ int main(int argc, char* argv[])
 			RT_pnp1_inv.at<double>(1,3) = -1*RT_pnp1.at<double>(1,3);
 			RT_pnp1_inv.at<double>(2,3) = -1*RT_pnp1.at<double>(2,3);
 
+			//invert(RT_pnp1, RT_pnp1_inv);
 			//RT_pnp1.at<double>(0,3) = RT_pnp1_inv.at<double>(0,3);
 			//RT_pnp1.at<double>(1,3) = RT_pnp1_inv.at<double>(1,3);
 			//RT_pnp1.at<double>(2,3) = RT_pnp1_inv.at<double>(2,3);
 
-			diff = RT_pnp1 - RT_pnp;
+			/*diff = RT_pnp1 - RT_pnp;			
+			for (int i = 0; i < 3; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					diff_inv.at<double>(i,j) = diff.at<double>(j,i);
+				}
+			}
+			diff_inv.at<double>(0,3) = -1*diff.at<double>(0,3);
+			diff_inv.at<double>(1,3) = -1*diff.at<double>(1,3);
+			diff_inv.at<double>(2,3) = -1*diff.at<double>(2,3);
+*/
 			//cout << "RT_pnp1: " << RT_pnp1 << endl;
 			//cout << "RT_pnp: " << RT_pnp << endl;
 			//cout << "diff: " << diff << endl;
@@ -847,12 +939,14 @@ int main(int argc, char* argv[])
 			//RT_pnp1.at<double>(1,3) = RT_pnp1.at<double>(1,3) - 2*diff.at<double>(1,3);	
 			//RT_pnp1.at<double>(2,3) = RT_pnp1.at<double>(2,3) - 2*diff.at<double>(2,3);	
 			drawPlane(drawn_image, p0_1, p1_1, p2_1, p3_1);
-			imshow("H_ii1", drawn_image);
+			//imshow("H_ii1", drawn_image);
 			keypoints_0 = keypoints_next;
 			descriptors_0 = descriptors_next;
 			image = image_next; 
 			H_wi = H_wi1;
-			updateSFML( elapsedTime, image, cameraMatrix, RT_pnp1_inv, s);
+			//updateSFML( 0, image, cameraMatrix, RT_pnp, (pnp_inv*RT_pnp1_inv), s);
+			updateSFML( 0, image, cameraMatrix, RT_pnp1_inv, s);
+			//updateSFML( 0, image, cameraMatrix, RT_pnp1, s);
 			//RT_pnp1 = RT_pnp1 + 2*diff;
 			//RT_pnp = ;
 			//RT_pnp1.copyTo(RT_pnp);
