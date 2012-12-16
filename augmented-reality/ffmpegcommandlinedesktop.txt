@@ -1,0 +1,5 @@
+ffmpeg -f x11grab -s `xdpyinfo | grep 'dimensions:'|awk '{print $2}'` -r 30 -qscale 1 -i :0.0 capture.mkv
+
+
+ffmpeg -f x11grab -s 640x480 -r 30 -qscale 1 -i :0.0 capture.mkv
+
